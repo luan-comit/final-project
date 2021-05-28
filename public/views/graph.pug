@@ -1,0 +1,25 @@
+head
+    script(src="https://cdn.jsdelivr.net/npm/chart.js", defer)
+    script.
+        const graphLabel = !{JSON.stringify(graphLabel)};
+        const graphUrl = !{JSON.stringify(graphUrl)};
+        const prices = !{JSON.stringify(arrayPrice)};
+        const dates = !{JSON.stringify(arrayDate)};   
+    script(src="../public/js/graph.js", defer)
+    link(rel="stylesheet", href="../public/css/justified-nav.css")
+body
+
+    a.btn.btn-lg.btn-success(href='/monitor', role='button') Go back
+
+    h4
+        a(href= graphUrl, target='blank')= graphLabel
+
+    div.graph-container
+        canvas.mygraph(id="myGraph")
+
+    
+    //each item in arrayPrice
+        p= item
+    //each item in arrayDate 
+        p= item
+    

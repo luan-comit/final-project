@@ -1,0 +1,15 @@
+head 
+body 
+    div 
+        each x in xArray
+            span= x
+                span ::
+        br
+        each y in yArray
+            span= y
+                span ::
+
+    script.
+        var xArray = !{JSON.stringify(xArray)};
+        console.log(xArray);
+        console.log(!{JSON.stringify(yArray)});
