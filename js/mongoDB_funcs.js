@@ -1,11 +1,9 @@
 
 const mongoClient = require('mongodb').MongoClient;
 
-const _mongoUrl = "mongodb://luan:12345abcdE@20.48.146.232:27017";
+const _mongoUrl = "mongodb://localhost:27017";
 const _db = "myproject"; // database of the project
-const _usersCollection = "users" // users collection
 const _itemFetchCollection = "items_fetch";
-const _itemGraphCollection = "items_graph";
 
 async function insertMongoDB(_collection, _object) {
     await mongoClient.connect(_mongoUrl, function (err, db) {
@@ -43,18 +41,6 @@ async function deleteGraphMongoDB(_url) {
         dbo.collection(_itemFetchCollection).deleteOne({ url: _url }, function (err, res) {
             if (err) throw err;
             console.log("1 document deleted ");
-            db.close();
-        });
-    });
-}
-
-async function updatePriceDateMongoDB(_collection, _url, _priceDate) {
-    await mongoClient.connect(_mongoUrl, function (err, db) {
-        if (err) throw err;
-        var dbo = db.db(_db);
-        dbo.collection(_collection).updateOne({url: _url} , { $push: {price_date_Arr: {_priceDate}}}, function (err, res) {
-            if (err) throw err;
-            console.log("price & date added ");
             db.close();
         });
     });
