@@ -1,0 +1,4 @@
+# bypass update files
+node_modules
+json
+secret_keys.json
