@@ -1,20 +1,21 @@
 
 const mongoClient = require('mongodb').MongoClient;
 
-const _mongoUrl = "mongodb://localhost:27017";
+const _mongoUrl = "mongodb://luan:12345abcdE@20.48.146.232:27017";
 const _db = "myproject"; // database of the project
+const _usersCollection = "users" // users collection
 const _itemFetchCollection = "items_fetch";
+const _itemGraphCollection = "items_graph";
 
 async function insertMongoDB(_collection, _object) {
     await mongoClient.connect(_mongoUrl, function (err, db) {
         if (err) throw err;
         var dbo = db.db(_db);
-        dbo.collection(_collection).insertOne(_object, function (err, res) 
-        {
+        dbo.collection(_collection).insertOne(_object, function (err, res) {
             if (err) throw err;
             console.log("1 document inserted");
             db.close();
-        
+
         });
 
 
@@ -46,6 +47,18 @@ async function deleteGraphMongoDB(_url) {
     });
 }
 
+async function updatePriceDateMongoDB(_collection, _url, _priceDate) {
+    await mongoClient.connect(_mongoUrl, function (err, db) {
+        if (err) throw err;
+        var dbo = db.db(_db);
+        dbo.collection(_collection).updateOne({ url: _url }, { $push: { price_date_Arr: { _priceDate } } }, function (err, res) {
+            if (err) throw err;
+            console.log("price & date added ");
+            db.close();
+        });
+    });
+}
+
 async function insertArrayMongoDB(_collection, _objectArray) {
     await mongoClient.connect(_mongoUrl, function (err, db) {
         if (err) throw err;
@@ -59,8 +72,8 @@ async function insertArrayMongoDB(_collection, _objectArray) {
 }
 
 
-async function checkUrlMongoDB(_collection, _url){
-     return await mongoClient.connect(_mongoUrl, function (err, db) {
+async function checkUrlMongoDB(_collection, _url) {
+    return await mongoClient.connect(_mongoUrl, function (err, db) {
         if (err) throw err;
         var dbo = db.db(_db);
         var result;
@@ -85,8 +98,8 @@ async function checkUrlMongoDB(_collection, _url){
     })
 }
 
-async function insertFetchedItem(_collection, _item){
-    if (checkUrlMongoDB(_collection,_item.url) == false) {
+async function insertFetchedItem(_collection, _item) {
+    if (checkUrlMongoDB(_collection, _item.url) == false) {
         insertMongoDB(_collection, _item);
     }
     else {
@@ -100,7 +113,7 @@ async function querySavedItemsMongoDB(_collection, _email) { //check if item (ur
         var dbo = db.db(_db);
         dbo.collection(_collection).find({ email: _email }).toArray(function (err, records) {
             if (err) throw err;
-    
+
             if (!records || records == null || records.length === 0) {
                 console.log("values send to monitor.pug is NULLLLLLL ", _email);
                 db.close();
@@ -135,7 +148,7 @@ async function querySavedItemsMongoDB(_collection, _email) { //check if item (ur
 
                 })
                 db.close();
-                console.log("values send to monitor.pug :::::::: ", _email , '\n', records);
+                console.log("values send to monitor.pug :::::::: ", _email, '\n', records);
                 return records;
                 //res.render('monitor', { listItems: records, logged: _isAuth, email: _email });
             }
@@ -153,4 +166,3 @@ module.exports =
     deleteGraphMongoDB,
     querySavedItemsMongoDB
 };
-

@@ -1,10 +1,14 @@
 const bodyParser = require('body-parser');
 const express = require('express');
 const puppeteer = require('puppeteer');
+const session = require('express-session');
+const mongoDBSession = require('connect-mongodb-session')(session);
+const mongoose = require('mongoose');
 
 const mongo_funcs = require('./public/js/mongoDB_funcs');
 const mongoClient = require('mongodb');
-const _mongoUrl = "mongodb://localhost:27017";
+const _mongoUrl = "mongodb://luan:12345abcdE@20.48.146.232:27017";
+const _appSessionsURI = "mongodb://luan:12345abcdE@20.48.146.232:27017/myproject"
 const _db = "myproject"; // database of the project
 const _usersCollection = "users"; // users collection
 const _fetchItemsCollection = "items_fetch";
@@ -27,23 +31,58 @@ app.use(express.static(__dirname + 'public'));
 
 //=============================================================================================
 
-///////////////////////////////////// TEST LAYOUT and CSS STYLES //////////////////////////////////
+///////////////////////////////////// MANAGE LOGIN SESSION//////////////////////////////////
 
-app.get('/layout', function (req, res) {
-    res.render('cover');
+mongoose
+    .connect(_appSessionsURI, {
+        useNewUrlParser: true,
+        useCreateIndex: true,
+        useUnifiedTopology: true
+    })
+    .then(function (res) {
+        console.log('MongoDB connected');
+    });
+
+const store = new mongoDBSession({
+    uri: _appSessionsURI,
+    collection: 'appSessions',
+});
+
+app.use(session({
+    secret: '12457239abxef;;',
+    resave: false,
+    saveUninitialized: false,
+    store: store,
+}))
+
+// check if authed to whether redirect to login
+
+const isAuth = function (req, res, next) {
+    if (req.session.isAuth) {
+        next();
+    } else {
+        res.redirect('/login');
+    }
+}
+
+/////////////////////////////////////END MANAGE LOGIN SESSION//////////////////////////////////
+
+app.get('/', function (req, res) {
+    console.log(req.session);
+    console.log(req.session.id);
+    console.log(req.session.isAuth);
+    res.render('index', { logged: req.session.isAuth, email: req.session.email });
 })
 
 ///////////////////////////////////// MANAGE USER REGISTRATION & LOGIN & LOGOUT //////////////////////////////////
 
 // registration for new user 
-// route = register , views = registration
 
 app.get('/register', function (req, res) {
-    res.render('register');
+    res.render('register', { logged: req.session.isAuth, email: req.session.email });
 })
 app.post('/register', function (req, res) {
     console.log(req.body);
-    //console.log(req.body.username);
     // check user if existed 
     mongoClient.connect(_mongoUrl, async function (err, db) {
         if (err) throw err;
@@ -53,7 +92,7 @@ app.post('/register', function (req, res) {
             else {
                 if (!user || user.length === 0 || user == null) {
                     mongo_funcs.insertMongoDB('users', req.body);
-                    res.render('login');
+                    res.render('login', { logged: req.session.isAuth, email: req.session.email });
                     let demo1 = require('./public/json/amazon_demo.json');
                     demo1.email = req.body.email;
                     demo1.password = req.body.password;
@@ -75,6 +114,7 @@ app.post('/register', function (req, res) {
 app.get('/login', function (req, res) {
     res.render('login', { logged: req.session.isAuth, email: req.session.email });
 })
+
 app.post('/login', function (req, res) {
     var { email, password } = req.body;
     console.log("params: ", email, '/', password);
@@ -90,7 +130,7 @@ app.post('/login', function (req, res) {
                 else {
                     req.session.isAuth = true;
                     req.session.email = email;
-                    res.render('index');
+                    res.render('index', { logged: req.session.isAuth, email: req.session.email });
                 }
             }
         })
@@ -106,10 +146,267 @@ app.post('/logout', function (req, res) {
 })
 /////////////////////////////////////END MANAGE USER REGISTRATION & LOGIN //////////////////////////////////
 
+///////////////////////////////////// MANAGE SAVED ITEMS & MONITOR //////////////////////////////////
+
+app.get('/monitor', function (req, res) {
+    if (req.session.isAuth) {
+        querySavedItemMongoDB();
+    } else {
+        res.redirect('/login');
+    }
+
+    async function querySavedItemMongoDB() { //check if item (url) exist in DB and insert if not exist
+        await mongoClient.connect(_mongoUrl, function (err, db) {
+            if (err) throw err;
+            var dbo = db.db(_db);
+            dbo.collection(_fetchItemsCollection).find({ email: req.session.email }).toArray(function (err, records) {
+                if (err) throw err;
+                db.close();
+                if (!records || records == null || records.length === 0) {
+                    console.log("values send to monitor.pug is NULL ", req.session.email);
+                    res.render('monitor', { listItems: false, logged: req.session.isAuth, email: req.session.email })
+                } else {
+                    records.map(function (record, index) {
+                        record.pos = index;
+                        // change format of price & date before sending to pug to display
+                        let rawDate = new Date(record.date);
+                        let displaydate = rawDate.getDate() + '/' + (rawDate.getMonth() + 1) + '/' + rawDate.getFullYear() + '\n' + rawDate.getHours() + ':' + rawDate.getMinutes();
+                        record.date = displaydate;
+                        if (record.saving) {
+                            let lens = record.saving.length;
+                            let lenp = record.price.length;
+                            record.price_list = '$' + (parseFloat(record.price.slice(1, lenp)) + parseFloat(record.saving.slice(6, lens))).toString();
+                        }
+                        else {
+                            if (record.price_list) {
+                                let len = record.price_list.length;
+                                record.price_list = '$' + parseFloat(record.price_list.slice(2, len)).toString();
+                            }
+                        }
+                    })
+                    res.render('monitor', { listItems: records, logged: req.session.isAuth, email: req.session.email });
+                }
+            });
+        });
+    }
+    //console.log("list Items ::::::::: ", listItems);
+})
+
+/////////////////////////////////////END MANAGE SAVED ITEMS & MONITOR //////////////////////////////////
+
+///////////////////////////////////// MANAGE ITEMS CLICKS //////////////////////////////////
+
+app.get('/displaygraph', function (req, res) {
+    res.render('graph');
+})
+
+app.post('/displaygraph', function (req, res) {
+    //console.log(req.body);
+    //res.json(req.body);
+    mongoClient.connect(_mongoUrl, function (err, db) {
+        if (err) throw err;
+        var dbo = db.db(_db);
+        dbo.collection(_itemsGraphCollection).findOne({ url: req.body.url }, function (err, record) {
+            if (err) throw err;
+            let arrayPrice = [];
+            let arrayDate = []
+            let graphLabel = record.title;
+            let graphUrl = record.url;
+            if (!record.price || record.price == null || record.price.length == 0) {
+                res.json('Graph invalid !');
+            } else {
+
+                for (i = 0; i < record.price_date_Arr.length; i++) {
+                    let rawDate = new Date(record.price_date_Arr[i].date);
+                    let displaydate = rawDate.getDate() + '/' + (rawDate.getMonth() + 1) + '/' + rawDate.getFullYear() + ' ' + rawDate.getHours() + ':' + rawDate.getMinutes();
+                    //console.log(displaydate);
+                    arrayDate[i] = displaydate;
+                    if (!record.price_date_Arr[i].price || record.price_date_Arr[i].price == null || record.price_date_Arr[i].price.length == 0) {
+                        arrayPrice[i] = 0;
+                    } else {
+                        let len = record.price_date_Arr[i].price.length;
+                        //console.log("price length::::", len);
+                        let priceStr = record.price_date_Arr[i].price.slice(1, len).replace(/,/, '');
+                        //console.log(priceStr);
+                        arrayPrice[i] = parseFloat(priceStr);
+                    }
+                    //arrayPrice[i] = record.price_date_Arr.price;
+                }
+                res.render('graph', { arrayPrice: arrayPrice, arrayDate: arrayDate, graphLabel: graphLabel, graphUrl: graphUrl });
+                //res.json(arrayPriceDate);
+                console.log("User::::::", req.session.email, '\n', arrayPrice, '\n', arrayDate);
+            }
+        })
+    })
+})
+
+app.post('/removeItem', async function (req, res) {
+    console.log(req.body);
+    await mongo_funcs.deleteFetchMongoDB(req.body.email, req.body.url);
+    res.redirect('/monitor');
+
+})
+
+app.post('/updatePriceDate', function (req, res) {
+    console.log(req.body);
+    var itemUpdate = {};
+    itemUpdate.date = Date.now();
+    itemUpdate.price = "$0";
+
+    // Check category and insert database 
+    switch (req.body.category) {
+        case "Amazon Laptop":
+            getpriceAwsLaptop(req.body.url);
+            res.json("Updating price & date :::: " + Date(itemUpdate.date) + ". Go back and click display to see updated price");
+            break;
+        case "Amazon Golf":
+            getpriceAwsGolf(req.body.url);
+            res.json("Updating price & date :::: " + Date(itemUpdate.date) + ". Go back and click display to see updated price");
+            break;
+        case "Bestbuy Laptop":
+            getpriceBBLaptop(req.body.url);
+            res.json("Updating price & date :::: " + Date(itemUpdate.date) + ". Go back and click display to see updated price");
+            break;
+        case "Kijiji Old Car":
+            getpriceKJJOldCar(req.body.url);
+            res.json("Updating price & date :::: " + Date(itemUpdate.date) + ". Go back and click display to see updated price");
+            break;
+        case "Kijiji Laptop":
+            getpriceKJJLaptop(req.body.url);
+            res.json("Updating price & date :::: " + Date(itemUpdate.date) + ". Go back and click display to see updated price");
+            break;
+        default:
+            res.send('Category is not available yet. Go back and chose another category');
+    }
+
+    async function updatePriceDateMongoDB() {
+        await mongoClient.connect(_mongoUrl, function (err, db) {
+            if (err) throw err;
+            var dbo = db.db(_db);
+            dbo.collection(_itemsGraphCollection).updateOne({ url: req.body.url }, { $push: { price_date_Arr: { price: itemUpdate.price, date: itemUpdate.date } } }, function (err, res) {
+                if (err) throw err;
+                console.log("price & date added ");
+            });
+            db.close();
+        });
+    }
+
+    async function getpriceAwsLaptop(_url) {
+        var browser = await puppeteer.launch({
+            executablePath: '/usr/bin/chromium-browser',
+            args: ['--no-sandbox']
+        });
+
+        var pageXpath = await browser.newPage();
+        await pageXpath.goto(_url)
+        try {
+            await pageXpath.waitForXPath(amazonLaptop.attr_xpath.price);
+            var [el4] = await pageXpath.$x(amazonLaptop.attr_xpath.price);
+            var price = await el4.getProperty('textContent');
+            itemUpdate.price = await price.jsonValue();
+            console.log("Price Date got:::::", itemUpdate);
+            updatePriceDateMongoDB();
+        }
+        catch (error) {
+            console.log('Error::::::::', error.message);
+        }
+        browser.close();
+    }
+
+    async function getpriceAwsGolf(_url) {
+        var browser = await puppeteer.launch({
+            executablePath: '/usr/bin/chromium-browser',
+            args: ['--no-sandbox']
+        });
+        var pageXpath = await browser.newPage();
+
+        await pageXpath.goto(_url)
+        try {
+            await pageXpath.waitForXPath(amazonGolf.attr_xpath.price);
+            var [el4] = await pageXpath.$x(amazonGolf.attr_xpath.price);
+            var price = await el4.getProperty('textContent');
+            itemUpdate.price = await price.jsonValue();
+            console.log("Price Date got:::::", itemUpdate);
+            updatePriceDateMongoDB();
+        }
+        catch (error) {
+            console.log('Error::::::::', error.message);
+        }
+        browser.close();
+    }
+
+    async function getpriceBBLaptop(_url) {
+        var browser = await puppeteer.launch({
+            executablePath: '/usr/bin/chromium-browser',
+            args: ['--no-sandbox']
+        });
+        var pageXpath = await browser.newPage();
+
+        await pageXpath.goto(_url)
+        try {
+            await pageXpath.waitForXPath(bestbuyLaptop.attr_xpath.price);
+            var [el4] = await pageXpath.$x(bestbuyLaptop.attr_xpath.price);
+            var price = await el4.getProperty('textContent');
+            itemUpdate.price = await price.jsonValue();
+            console.log("Price Date got:::::", itemUpdate);
+            updatePriceDateMongoDB();
+        }
+        catch (error) {
+            console.log('Error::::::::', error.message);
+        }
+        browser.close();
+    }
+
+    async function getpriceKJJLaptop(_url) {
+        var browser = await puppeteer.launch({
+            executablePath: '/usr/bin/chromium-browser',
+            args: ['--no-sandbox']
+        });
+        var pageXpath = await browser.newPage();
+
+        await pageXpath.goto(_url)
+        try {
+            await pageXpath.waitForXPath(kijijiLaptop.attr_xpath.price);
+            var [el4] = await pageXpath.$x(kijijiLaptop.attr_xpath.price);
+            var price = await el4.getProperty('textContent');
+            itemUpdate.price = await price.jsonValue();
+            console.log("Price Date got:::::", itemUpdate);
+            updatePriceDateMongoDB();
+        }
+        catch (error) {
+            console.log('Error::::::::', error.message);
+        }
+        browser.close();
+    }
+    async function getpriceKJJOldCar(_url) {
+        var browser = await puppeteer.launch({
+            executablePath: '/usr/bin/chromium-browser',
+            args: ['--no-sandbox']
+        });
+        var pageXpath = await browser.newPage();
+
+        await pageXpath.goto(_url)
+        try {
+            await pageXpath.waitForXPath(kijijiOldCar.attr_xpath.price);
+            var [el4] = await pageXpath.$x(kijijiOldCar.attr_xpath.price);
+            var price = await el4.getProperty('textContent');
+            itemUpdate.price = await price.jsonValue();
+            console.log("Price Date got:::::", itemUpdate);
+            updatePriceDateMongoDB();
+        }
+        catch (error) {
+            console.log('Error::::::::', error.message);
+        }
+        browser.close();
+    }
+})
+
+/////////////////////////////////////END MANAGE ITEMS CLICKS //////////////////////////////////
+
 /////////////////////////////////////FETCH LINKS //////////////////////////////////
 
 app.get('/fetch', function (req, res) {
-    res.render('fetch', { linkItems: false });
+    res.render('fetch', { linkItems: false, logged: req.session.isAuth, email: req.session.email });
 })
 
 app.post('/fetch', function (req, res) {
@@ -117,6 +414,7 @@ app.post('/fetch', function (req, res) {
     var linkItems = [];
     console.log(category);
     if (count >= 10) count = 9;
+    
     // get Amazon Laptop
     async function getAwsLaptop() {
         var browser = await puppeteer.launch({
@@ -124,7 +422,6 @@ app.post('/fetch', function (req, res) {
             args: ['--no-sandbox']
         });
         var pageURL = await browser.newPage();
-
         console.log("getAwsLaptop: ", amazonLaptop.Url);
 
         await pageURL.goto(amazonLaptop.Url);
@@ -145,7 +442,7 @@ app.post('/fetch', function (req, res) {
         }
         // map item and send to fetch
         if (!linkItems || linkItems.length === 0) {
-            res.render('fetch', { linkItems: false});
+            res.render('fetch', { linkItems: false, logged: req.session.isAuth, email: req.session.email });
         }
         else {
             linkItems.map(linkItem => {  // STILL GOT ISSUE with setting linkisNull value
@@ -156,7 +453,7 @@ app.post('/fetch', function (req, res) {
                     linkItem.isNull = false;
                 }
             })
-            res.render('fetch', { linkItems: linkItems });
+            res.render('fetch', { linkItems: linkItems, logged: req.session.isAuth, email: req.session.email });
         }
         browser.close();
         console.log(linkItems);
@@ -190,7 +487,7 @@ app.post('/fetch', function (req, res) {
         }
         // map item and send to fetch.ejs
         if (!linkItems || linkItems.length === 0) {
-            res.render('fetch', { linkItems: false });
+            res.render('fetch', { linkItems: false, logged: req.session.isAuth, email: req.session.email });
         }
         else {
             linkItems.map(linkItem => {  // STILL GOT ISSUE with setting linkisNull value
@@ -201,7 +498,7 @@ app.post('/fetch', function (req, res) {
                     linkItem.isNull = false;
                 }
             })
-            res.render('fetch', { linkItems: linkItems });
+            res.render('fetch', { linkItems: linkItems, logged: req.session.isAuth, email: req.session.email });
         }
         browser.close();
         console.log(linkItems);
@@ -239,7 +536,7 @@ app.post('/fetch', function (req, res) {
         }
         // map item and send to fetch
         if (!linkItems || linkItems.length === 0) {
-            res.render('fetch', { linkItems: false });
+            res.render('fetch', { linkItems: false, logged: req.session.isAuth, email: req.session.email });
         }
         else {
             linkItems.map(linkItem => {  // STILL GOT ISSUE with setting linkisNull value
@@ -250,7 +547,7 @@ app.post('/fetch', function (req, res) {
                     linkItem.isNull = false;
                 }
             })
-            res.render('fetch', { linkItems: linkItems });
+            res.render('fetch', { linkItems: linkItems, logged: req.session.isAuth, email: req.session.email });
         }
         await browser.close();
         console.log(linkItems);
@@ -286,7 +583,7 @@ app.post('/fetch', function (req, res) {
         }
         // map item and send to fetch
         if (!linkItems || linkItems.length === 0) {
-            res.render('fetch', { linkItems: false});
+            res.render('fetch', { linkItems: false, logged: req.session.isAuth, email: req.session.email });
         }
         else {
             linkItems.map(linkItem => {  // STILL GOT ISSUE with setting linkisNull value
@@ -297,7 +594,7 @@ app.post('/fetch', function (req, res) {
                     linkItem.isNull = false;
                 }
             })
-            res.render('fetch', { linkItems: linkItems });
+            res.render('fetch', { linkItems: linkItems, logged: req.session.isAuth, email: req.session.email });
         }
         await browser.close();
         console.log(linkItems);
@@ -333,7 +630,7 @@ app.post('/fetch', function (req, res) {
         }
         // map item and send to fetch
         if (!linkItems || linkItems.length === 0) {
-            res.render('fetch', { linkItems: false });
+            res.render('fetch', { linkItems: false, logged: req.session.isAuth, email: req.session.email });
         }
         else {
             linkItems.map(linkItem => {  // STILL GOT ISSUE with setting linkisNull value
@@ -344,7 +641,7 @@ app.post('/fetch', function (req, res) {
                     linkItem.isNull = false;
                 }
             })
-            res.render('fetch', { linkItems: linkItems });
+            res.render('fetch', { linkItems: linkItems, logged: req.session.isAuth, email: req.session.email });
         }
         await browser.close();
         console.log(linkItems);
@@ -380,7 +677,7 @@ app.post('/fetch', function (req, res) {
         }
         // map item and send to fetch
         if (!linkItems || linkItems.length === 0) {
-            res.render('fetch', { linkItems: false });
+            res.render('fetch', { linkItems: false, logged: req.session.isAuth, email: req.session.email });
         }
         else {
             linkItems.map(linkItem => {  // STILL GOT ISSUE with setting linkisNull value
@@ -391,7 +688,7 @@ app.post('/fetch', function (req, res) {
                     linkItem.isNull = false;
                 }
             })
-            res.render('fetch', { linkItems: linkItems });
+            res.render('fetch', { linkItems: linkItems, logged: req.session.isAuth, email: req.session.email });
         }
         await browser.close();
         console.log(linkItems);
@@ -757,8 +1054,6 @@ app.post('/saveItem', isAuth, function (req, res) {
 })
 
 /////////////////////////////////////END SAVE 1 FETCHED ITEM SELECTED//////////////////////////////////
-
-//========================================================================================
 
 
 app.listen(5000, function () {
