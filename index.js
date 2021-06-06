@@ -417,10 +417,16 @@ app.post('/fetch', function (req, res) {
     
     // get Amazon Laptop
     async function getAwsLaptop() {
+    
+        var browser = await puppeteer.launch();
+
+    /*   use this code if run nodejs in Linux and got problem with chromium
         var browser = await puppeteer.launch({
             executablePath: '/usr/bin/chromium-browser',
             args: ['--no-sandbox']
         });
+    */
+
         var pageURL = await browser.newPage();
         console.log("getAwsLaptop: ", amazonLaptop.Url);
 
@@ -461,10 +467,12 @@ app.post('/fetch', function (req, res) {
 
     // get Amazon Golf
     async function getAwsGolf() {
-        var browser = await puppeteer.launch({
-            executablePath: '/usr/bin/chromium-browser',
-            args: ['--no-sandbox']
-        });
+        var browser = await puppeteer.launch();
+        /*   use this code if run nodejs in Linux and got problem with chromium
+            var browser = await puppeteer.launch({
+                executablePath: '/usr/bin/chromium-browser',
+                args: ['--no-sandbox']
+            }); */
         var pageURL = await browser.newPage();
 
         console.log("getAwsGolf: ", amazonGolf.Url);
@@ -506,10 +514,12 @@ app.post('/fetch', function (req, res) {
 
     // getBestBuyLaptop
     async function getBBLaptop() {
-        var browser = await puppeteer.launch({
-            executablePath: '/usr/bin/chromium-browser',
-            args: ['--no-sandbox']
-        });
+        var browser = await puppeteer.launch();
+        /*   use this code if run nodejs in Linux and got problem with chromium
+            var browser = await puppeteer.launch({
+                executablePath: '/usr/bin/chromium-browser',
+                args: ['--no-sandbox']
+            }); */
         var pageURL = await browser.newPage();
         console.log("getBestBuyLaptop: ", bestbuyLaptop.Url);
 
@@ -554,10 +564,12 @@ app.post('/fetch', function (req, res) {
     }
     // get Kijiji laptop
     async function getKJJLaptop() {
-        var browser = await puppeteer.launch({
-            executablePath: '/usr/bin/chromium-browser',
-            args: ['--no-sandbox']
-        });
+        var browser = await puppeteer.launch();
+        /*   use this code if run nodejs in Linux and got problem with chromium
+            var browser = await puppeteer.launch({
+                executablePath: '/usr/bin/chromium-browser',
+                args: ['--no-sandbox']
+            }); */
         var pageURL = await browser.newPage();
         console.log("getKijijiLaptop: ", kijijiLaptop.Url);
 
@@ -601,10 +613,12 @@ app.post('/fetch', function (req, res) {
     }
     // get Kijiji Old Car
     async function getKJJOldCar() {
-        var browser = await puppeteer.launch({
-            executablePath: '/usr/bin/chromium-browser',
-            args: ['--no-sandbox']
-        });
+        var browser = await puppeteer.launch();
+        /*   use this code if run nodejs in Linux and got problem with chromium
+            var browser = await puppeteer.launch({
+                executablePath: '/usr/bin/chromium-browser',
+                args: ['--no-sandbox']
+            }); */
         var pageURL = await browser.newPage();
         console.log("getKijijiOldCar: ", kijijiOldCar.Url);
 
@@ -648,10 +662,12 @@ app.post('/fetch', function (req, res) {
     }
     // get Kijiji House
     async function getKJJHouse() {
-        var browser = await puppeteer.launch({
-            executablePath: '/usr/bin/chromium-browser',
-            args: ['--no-sandbox']
-        });
+        var browser = await puppeteer.launch();
+        /*   use this code if run nodejs in Linux and got problem with chromium
+            var browser = await puppeteer.launch({
+                executablePath: '/usr/bin/chromium-browser',
+                args: ['--no-sandbox']
+            }); */
         var pageURL = await browser.newPage();
         console.log("getKijijiHouse: ", kijijiHouse.Url);
 
@@ -804,10 +820,12 @@ app.post('/saveItem', isAuth, function (req, res) {
 
     // fetch info 1 item AWS Laptop then insert to items_fetch collection
     async function SaveAwsLaptop() {
-        var browser = await puppeteer.launch({
-            executablePath: '/usr/bin/chromium-browser',
-            args: ['--no-sandbox']
-        });
+        var browser = await puppeteer.launch();
+        /*   use this code if run nodejs in Linux and got problem with chromium
+            var browser = await puppeteer.launch({
+                executablePath: '/usr/bin/chromium-browser',
+                args: ['--no-sandbox']
+            }); */
         var pageXpath = await browser.newPage();
         //itemToSave.email = email;
         //itemToSave.category = category;
@@ -848,10 +866,12 @@ app.post('/saveItem', isAuth, function (req, res) {
 
     // fetch info 1 item AWS Golf then insert to items_fetch collection
     async function SaveAwsGolf() {
-        var browser = await puppeteer.launch({
-            executablePath: '/usr/bin/chromium-browser',
-            args: ['--no-sandbox']
-        });
+        var browser = await puppeteer.launch();
+        /*   use this code if run nodejs in Linux and got problem with chromium
+            var browser = await puppeteer.launch({
+                executablePath: '/usr/bin/chromium-browser',
+                args: ['--no-sandbox']
+            }); */
         var pageXpath = await browser.newPage();
 
         await pageXpath.goto(url)
@@ -889,10 +909,12 @@ app.post('/saveItem', isAuth, function (req, res) {
     }
     // fetch info 1 item Bestbuy Laptop then insert to items_fetch collection
     async function SaveBBLaptop() {
-        var browser = await puppeteer.launch({
-            executablePath: '/usr/bin/chromium-browser',
-            args: ['--no-sandbox']
-        });
+        var browser = await puppeteer.launch();
+        /*   use this code if run nodejs in Linux and got problem with chromium
+            var browser = await puppeteer.launch({
+                executablePath: '/usr/bin/chromium-browser',
+                args: ['--no-sandbox']
+            }); */
         var pageXpath = await browser.newPage();
 
         await pageXpath.goto(url)
@@ -930,10 +952,12 @@ app.post('/saveItem', isAuth, function (req, res) {
     }
     // fetch info 1 item Kijiji laptop then insert to items_fetch collection
     async function SaveKJJLaptop() {
-        var browser = await puppeteer.launch({
-            executablePath: '/usr/bin/chromium-browser',
-            args: ['--no-sandbox']
-        });
+        var browser = await puppeteer.launch();
+        /*   use this code if run nodejs in Linux and got problem with chromium
+            var browser = await puppeteer.launch({
+                executablePath: '/usr/bin/chromium-browser',
+                args: ['--no-sandbox']
+            }); */
         var pageXpath = await browser.newPage();
 
         await pageXpath.goto(url)
@@ -971,10 +995,12 @@ app.post('/saveItem', isAuth, function (req, res) {
     }
     // fetch info 1 item Kijiji old car then insert to items_fetch collection
     async function SaveKJJOldCar() {
-        var browser = await puppeteer.launch({
-            executablePath: '/usr/bin/chromium-browser',
-            args: ['--no-sandbox']
-        });
+        var browser = await puppeteer.launch();
+        /*   use this code if run nodejs in Linux and got problem with chromium
+            var browser = await puppeteer.launch({
+                executablePath: '/usr/bin/chromium-browser',
+                args: ['--no-sandbox']
+            }); */
         var pageXpath = await browser.newPage();
 
         await pageXpath.goto(url)
@@ -1012,10 +1038,12 @@ app.post('/saveItem', isAuth, function (req, res) {
     }
     // fetch info 1 item Kijiji House then insert to items_fetch collection
     async function SaveKJJHouse() {
-        var browser = await puppeteer.launch({
-            executablePath: '/usr/bin/chromium-browser',
-            args: ['--no-sandbox']
-        });
+        var browser = await puppeteer.launch();
+        /*   use this code if run nodejs in Linux and got problem with chromium
+            var browser = await puppeteer.launch({
+                executablePath: '/usr/bin/chromium-browser',
+                args: ['--no-sandbox']
+            }); */
         var pageXpath = await browser.newPage();
 
         await pageXpath.goto(url)
