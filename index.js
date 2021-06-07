@@ -13,6 +13,7 @@ const _db = "myproject"; // database of the project
 const _usersCollection = "users"; // users collection
 const _fetchItemsCollection = "items_fetch";
 const _itemsGraphCollection = "items_graph";
+const _linksCollection = "links_fetch";
 
 const app = express();
 app.use(bodyParser.json());
