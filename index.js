@@ -13,12 +13,6 @@ const _db = "myproject"; // database of the project
 const _usersCollection = "users"; // users collection
 const _fetchItemsCollection = "items_fetch";
 const _itemsGraphCollection = "items_graph";
-const amazonLaptop = require('./json/amazon_laptop.json');
-const amazonGolf = require('./json/amazon_golf.json');
-const bestbuyLaptop = require('./json/bestbuy_laptop.json');
-const kijijiHouse = require('./json/kijiji_house.json');
-const kijijiOldCar = require('./json/kijiji_oldcars.json');
-const kijijiLaptop = require('./json/kijiji_laptop.json');
 
 const app = express();
 app.use(bodyParser.json());
@@ -30,6 +24,68 @@ app.use(express.static(__dirname + 'public'));
 
 
 //=============================================================================================
+
+///////////////////////////////////// GET CATEGORIES INFORMATION  //////////////////////////////////
+var amazonLaptop = {};
+var amazonGolf = {};
+var bestbuyLaptop = {};
+var kijijiOldCar = {};
+var kijijiLaptop = {};
+var bestbuyDrone = {};
+var amazonGarmin = {};
+
+async function getCategories() {
+    await mongoClient.connect(_mongoUrl, function (err, db) {
+        if (err) throw err;
+        var dbo = db.db(_db);
+        dbo.collection(_linksCollection).find().toArray(function (err, records) {
+            if (err) throw err;
+            else {
+                if (!records || records.length === 0 || records == null) {
+                    return false;
+                }
+                else {
+                    for (let i = 0; i < records.length; i++) {
+                        if (records[i].category_name == 'Amazon Laptop') {
+                            amazonLaptop = records[i];
+                        }
+                        if (records[i].category_name == 'Amazon Golf') {
+                            amazonGolf = records[i];
+                        }
+                        if (records[i].category_name == 'Amazon Garmin') {
+                            amazonGarmin = records[i];
+                        }
+                        if (records[i].category_name == 'Bestbuy Laptop') {
+                            bestbuyLaptop = records[i];
+                        }
+                        if (records[i].category_name == 'Kijiji Laptop') {
+                            kijijiLaptop = records[i];
+                        }
+                        if (records[i].category_name == 'Kijiji Classic Car') {
+                            kijijiOldCar = records[i];
+                        }
+                        if (records[i].category_name == 'Bestbuy Drone') {
+                            bestbuyDrone = records[i];
+                        }
+                    }
+                    console.log('AMZ Laptop :::', amazonLaptop);
+                    console.log('AMZ Golf :::', amazonGolf);
+                    console.log('AMZ Garmin :::', amazonGarmin);
+                    console.log('Bestbuy Laptop :::', bestbuyLaptop);
+                    console.log('Bestbuy Drone :::', bestbuyDrone);
+                    console.log('Kijiji Classic Car :::', kijijiOldCar);
+                    console.log('Kijiji Laptop :::', kijijiLaptop);
+                }
+            }
+        })
+        db.close();
+    })
+
+}
+
+getCategories();
+
+///////////////////////////////////// END GET CATEGORIES INFORMATION  //////////////////////////////////
 
 ///////////////////////////////////// MANAGE LOGIN SESSION//////////////////////////////////
 
