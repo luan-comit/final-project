@@ -5,7 +5,8 @@ append styles
         script(src="https://www.paypalobjects.com/api/checkout.js")
     body
         div(id="paypal-button")
-
+        footer.footer
+            p © Price Monitor - ComIT NodeJS Project 2021
         script.
             paypal.Button.render({
                 env: 'sandbox', // Or 'production'
