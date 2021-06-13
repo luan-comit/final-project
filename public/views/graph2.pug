@@ -1,0 +1,30 @@
+head
+    script.
+        window.onload = function () {
+            var chart = new CanvasJS.Chart("chartContainer", {
+                animationEnabled: true,
+                title: {
+                    text: "Website Traffic"
+                },
+                axisX: {
+                    valueFormatString: "DD MMM YYYY HH MN"
+                },
+                axisY: {
+                    title: "Number of Visitors",
+                    scaleBreaks: {
+                        autoCalculate: true
+                    }
+                },
+                data: [{
+                    type: "line",
+                    xValueFormatString: "DD MMM",
+                    color: "#F08080",
+                    dataPoints: !{{arrayPriceDate}}
+                        
+                }]
+            });
+            chart.render();
+        }
+body
+    div(id="chartContainer", style="height: 370px; max-width: 920px; margin: 0px auto;")
+    script(src="https://canvasjs.com/assets/script/canvasjs.min.js")

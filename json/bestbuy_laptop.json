@@ -1,0 +1,41 @@
+{
+    "vendor_Id": "BBY_CAN_001",
+    "vendor_Name": "Bestbuy Canada",
+    "Category_Id": "0001",
+    "category_name": "Bestbuy Laptop",
+    "location": "Winnipeg",
+    "Url": "https://www.bestbuy.ca/en-ca/collection/2-in-1-on-sale/161123?icmp=computing_laptops_onsale_shopby_2_in_1_laptops",
+    "link_xpath": [
+        "//*[@id=\"root\"]/div/div[3]/div[1]/div/main/div[1]/div[4]/div/div/ul/div/div[1]/div/a",
+        "//*[@id=\"root\"]/div/div[3]/div[1]/div/main/div[1]/div[4]/div/div/ul/div/div[2]/div/a",
+        "//*[@id=\"root\"]/div/div[3]/div[1]/div/main/div[1]/div[4]/div/div/ul/div/div[3]/div/a",
+        "//*[@id=\"root\"]/div/div[3]/div[1]/div/main/div[1]/div[4]/div/div/ul/div/div[4]/div/a",
+        "//*[@id=\"root\"]/div/div[3]/div[1]/div/main/div[1]/div[4]/div/div/ul/div/div[5]/div/a",
+        "//*[@id=\"root\"]/div/div[3]/div[1]/div/main/div[1]/div[4]/div/div/ul/div/div[6]/div/a",
+        "//*[@id=\"root\"]/div/div[3]/div[1]/div/main/div[1]/div[4]/div/div/ul/div/div[7]/div/a",
+        "//*[@id=\"root\"]/div/div[3]/div[1]/div/main/div[1]/div[4]/div/div/ul/div/div[8]/div/a",
+        "//*[@id=\"root\"]/div/div[3]/div[1]/div/main/div[1]/div[4]/div/div/ul/div/div[9]/div/a",
+        "//*[@id=\"root\"]/div/div[3]/div[1]/div/main/div[1]/div[4]/div/div/ul/div/div[10]/div/a",
+        "//*[@id=\"root\"]/div/div[3]/div[1]/div/main/div[1]/div[4]/div/div/ul/div/div[11]/div/a",
+        "//*[@id=\"root\"]/div/div[3]/div[1]/div/main/div[1]/div[4]/div/div/ul/div/div[12]/div/a",
+        "//*[@id=\"root\"]/div/div[3]/div[1]/div/main/div[1]/div[2]/section[2]/div/div/ul/div/div/div/div[4]/div/li/div/a",
+        "//*[@id=\"root\"]/div/div[3]/div[1]/div/main/div[1]/div[2]/section[2]/div/div/ul/div/div/div/div[5]/div/li/div/a",
+        "//*[@id=\"root\"]/div/div[3]/div[1]/div/main/div[1]/div[2]/section[2]/div/div/ul/div/div/div/div[6]/div/li/div/a",
+        "//*[@id=\"root\"]/div/div[3]/div[1]/div/main/div[1]/div[2]/section[2]/div/div/ul/div/div/div/div[7]/div/li/div/a",
+        "//*[@id=\"root\"]/div/div[3]/div[1]/div/main/div[1]/div[2]/section[2]/div/div/ul/div/div/div/div[8]/div/li/div/a",
+        "//*[@id=\"root\"]/div/div[3]/div[1]/div/main/div[1]/div[2]/section[2]/div/div/ul/div/div/div/div[9]/div/li/div/a",
+        "//*[@id=\"root\"]/div/div[3]/div[1]/div/main/div[1]/div[2]/section[2]/div/div/ul/div/div/div/div[10]/div/li/div/a",
+        "//*[@id=\"root\"]/div/div[3]/div[1]/div/main/div[1]/div[2]/section[2]/div/div/ul/div/div/div/div[11]/div/li/div/a",
+        "//*[@id=\"root\"]/div/div[3]/div[1]/div/main/div[1]/div[2]/section[2]/div/div/ul/div/div/div/div[12]/div/li/div/a",
+        "//*[@id=\"root\"]/div/div[3]/div[1]/div/main/div[1]/div[2]/section[2]/div/div/ul/div/div/div/div[13]/div/li/div/a",
+        "//*[@id=\"root\"]/div/div[3]/div[1]/div/main/div[1]/div[2]/section[2]/div/div/ul/div/div/div/div[14]/div/li/div/a",
+        "//*[@id=\"root\"]/div/div[3]/div[1]/div/main/div[1]/div[2]/section[2]/div/div/ul/div/div/div/div[15]/div/li/div/a"
+    ],
+    "attr_xpath":{
+            "img_src": "//*[@id=\"root\"]/div/div[4]/div[1]/div[2]/div[1]/div[1]/div/div[1]/div/div/div[1]/div/div/div/div/div/img",
+            "title": "//*[@id=\"root\"]/div/div[4]/div[1]/h1",
+            "price_old": "//*[@id=\"root\"]/div/div[4]/div[1]/div[2]/div[2]/div[1]/div[1]/span[2]/span",
+            "price": "//*[@id=\"root\"]/div/div[4]/div[1]/div[2]/div[2]/div[1]/div[1]/span/span",
+            "saving": "//*[@id=\"root\"]/div/div[4]/div[1]/div[2]/div[2]/div[1]/div[1]/span[1]"
+    }
+}

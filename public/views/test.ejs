@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landing</title>
+</head>
+<body>
+<form action="/logout" method="POST">
+    <input type="submit" name="logout" value="logout" style="margin: 10px ; width: fit-content; font-size: large; color: red;">
+</form>
+
+<% if(files){ %>
+    <% files.forEach((file)=> { %>
+        <div class="card card-body mb-3">
+            <% if(file.isImage) { %>
+                <img src="image/<%= file.filename %>" alt="">
+                <% } else { %>
+                    <%= file.filename %>
+                        <% } %>
+                            <form method="POST" action="/filedelete/<%= file._id %>?_method=DELETE">
+                                <button class="btn btn-danger btn-block m-4">Delete
+                                </button>
+                            </form>
+        </div>
+        <% }) %>
+            <%} else { %>
+                <p>No file to display</p>
+                <% } %>
+
+</body>
+</html>

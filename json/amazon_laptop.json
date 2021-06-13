@@ -1,0 +1,38 @@
+{
+    "vendor_Id": "AWS_CAN_001",
+    "vendor_Name": "Amazon Canada",
+    "Category_Id": "0001",
+    "category_name": "Amazon Laptop",
+    "location": "Winnipeg",
+    "Url": "https://www.amazon.ca/s?i=electronics&bbn=677252011&rh=n%3A667823011%2Cn%3A677211011%2Cn%3A2404990011%2Cn%3A677252011%2Cp_n_operating_system_browse-bin%3A14083352011%2Cp_6%3AA3DWYIK6Y9EEQB&dc&pf_rd_i=677252011&pf_rd_m=A1IM4EOPHS76S7&pf_rd_p=c8520d34-e520-43d7-8c22-82a3ca888253&pf_rd_r=WJAR2YXQZFSQVX7D83T2&pf_rd_s=merchandised-search-2&pf_rd_t=101&qid=1622408558&rnid=12035754011&ref=sr_nr_p_6_3",
+    "link_xpath": [
+        "//*[@id=\"search\"]/div[1]/div/div[1]/div/span[3]/div[2]/div[1]/div/span/div/div/span/a",
+        "//*[@id=\"search\"]/div[1]/div/div[1]/div/span[3]/div[2]/div[2]/div/span/div/div/span/a",
+        "//*[@id=\"search\"]/div[1]/div/div[1]/div/span[3]/div[2]/div[3]/div/span/div/div/span/a",
+        "//*[@id=\"search\"]/div[1]/div/div[1]/div/span[3]/div[2]/div[4]/div/span/div/div/span/a",
+        "//*[@id=\"search\"]/div[1]/div/div[1]/div/span[3]/div[2]/div[5]/div/span/div/div/span/a",
+        "//*[@id=\"search\"]/div[1]/div/div[1]/div/span[3]/div[2]/div[6]/div/span/div/div/span/a",
+        "//*[@id=\"search\"]/div[1]/div/div[1]/div/span[3]/div[2]/div[7]/div/span/div/div/span/a",
+        "//*[@id=\"search\"]/div[1]/div/div[1]/div/span[3]/div[2]/div[8]/div/span/div/div/span/a",
+        "//*[@id=\"search\"]/div[1]/div/div[1]/div/span[3]/div[2]/div[9]/div/span/div/div/span/a",
+        "//*[@id=\"search\"]/div[1]/div/div[1]/div/span[3]/div[2]/div[10]/div/span/div/div/span/a",
+        "//*[@id=\"search\"]/div[1]/div/div[1]/div/span[3]/div[2]/div[1]/div/span/div/div/div/div/span/a",
+        "//*[@id=\"search\"]/div[1]/div/div[1]/div/span[3]/div[2]/div[2]/div/span/div/div/div/div/span/a",
+        "//*[@id=\"search\"]/div[1]/div/div[1]/div/span[3]/div[2]/div[3]/div/span/div/div/div/div/span/a",
+        "//*[@id=\"search\"]/div[1]/div/div[1]/div/span[3]/div[2]/div[4]/div/span/div/div/div/div/span/a",
+        "//*[@id=\"search\"]/div[1]/div/div[1]/div/span[3]/div[2]/div[5]/div/span/div/div/div/div/span/a",
+        "//*[@id=\"search\"]/div[1]/div/div[1]/div/span[3]/div[2]/div[6]/div/span/div/div/div/div/span/a",
+        "//*[@id=\"search\"]/div[1]/div/div[1]/div/span[3]/div[2]/div[7]/div/span/div/div/div/div/span/a",
+        "//*[@id=\"search\"]/div[1]/div/div[1]/div/span[3]/div[2]/div[8]/div/span/div/div/div/div/span/a",
+        "//*[@id=\"search\"]/div[1]/div/div[1]/div/span[3]/div[2]/div[9]/div/span/div/div/div/div/span/a",
+        "//*[@id=\"search\"]/div[1]/div/div[1]/div/span[3]/div[2]/div[10]/div/span/div/div/div/div/span/a"
+    ],
+    "attr_xpath": {
+            "img_src": "//*[@id=\"landingImage\"]",
+            "title": "//*[@id=\"productTitle\"]",
+            "price": "//*[@id=\"priceblock_ourprice\"]",
+            "dealprice": "//*[@id=\"priceblock_dealprice\"]",
+            "ourprice": "//*[@id=\"priceblock_ourprice\"]",
+            "price_list":"//*[@id=\"price\"]/table/tbody/tr[1]/td[2]/span[1]"
+    }
+}

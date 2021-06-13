@@ -1,0 +1,57 @@
+extends ./_bootstrap
+append styles
+    head 
+        link(rel="stylesheet", href="../css/style.css")
+        link(href='../css/justified-nav.css', rel='stylesheet')
+        script(src="https://polyfill.io/v3/polyfill.min.js?version=3.52.1&features=fetch")
+        script(src="https://js.stripe.com/v3/")
+    include ./components/tables
+    body
+    // Jumbotron
+    .container
+        .jumbotron
+            h3 My Cart
+                a.mycart(href='./shop')
+                    span Shop
+            .jumbotron
+                .table-responsive
+                    table.table.table-striped
+                        thead
+                            tr
+                                th.thumnail-tbl Product
+                                th Unit Price
+                                th Quantity
+                                th Total 
+                        tbody(id='tbl-body')
+            button.btn.btn-lg.btn-primary.btn-block(type="button" id="checkout-button") Proceed to payment
+        .container
+            footer.footer
+                p © Price Monitor Project 2021
+        script.
+            const listItems = !{JSON.stringify(listItems)};
+            // Create an instance of the Stripe object with your publishable API key
+            var stripe = Stripe("pk_test_51IwHwvFbB7dBcGLWIQQnLVcwZ1yvNDMU029ReetdkxackPrCxLhC3JC0vOTUI9lWYGkCT3fbvcKegvJuhcVNeXc100JvPxhkyT");
+            var checkoutButton = document.getElementById("checkout-button");
+            checkoutButton.addEventListener("click", function () {
+                fetch("/stripe", {
+                    method: "POST",
+                })
+                    .then(function (response) {
+                        return response.json();
+                    })
+                    .then(function (session) {
+                        return stripe.redirectToCheckout({ sessionId: session.id });
+                    })
+                    .then(function (result) {
+                        // If redirectToCheckout fails due to a browser or network
+                        // error, you should display the localized error message to your
+                        // customer using error.message.
+                        if (result.error) {
+                            alert(result.error.message);
+                        }
+                    })
+                    .catch(function (error) {
+                        console.error("Error:", error);
+                    });
+            });
+        script(src="../js/cart.js", defer)
