@@ -1344,7 +1344,7 @@ app.get('/shoptest', function (req, res) {
 /////////////////////////////////////END SHOP//////////////////////////////////
 
 /////////////////////////////////////STRIPE PAYMENT//////////////////////////////////
-const MYDOMAIN = 'https://rocky-garden-76642.herokuapp.com/';
+const MYDOMAIN = 'https://luanle-test.herokuapp.com/';
 
 app.post('/stripe/:totalpayment', async (req, res) => {
     var totalpayment = parseInt(req.params.totalpayment);
