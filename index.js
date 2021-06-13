@@ -1344,7 +1344,7 @@ app.get('/shoptest', function (req, res) {
 /////////////////////////////////////END SHOP//////////////////////////////////
 
 /////////////////////////////////////STRIPE PAYMENT//////////////////////////////////
-const MYDOMAIN = 'http://localhost:4001';
+const MYDOMAIN = 'https://rocky-garden-76642.herokuapp.com/';
 
 app.post('/stripe/:totalpayment', async (req, res) => {
     var totalpayment = parseInt(req.params.totalpayment);
@@ -1354,7 +1354,7 @@ app.post('/stripe/:totalpayment', async (req, res) => {
         line_items: [
             {
                 price_data: {
-                    currency: 'usd',
+                    currency: 'cad',
                     product_data: {
                         name: 'Price Monitor',
                         images: ['https://www.elearnexcel.com/wp-content/uploads/2013/08/Stripe-Logo.png'],
