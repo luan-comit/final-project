@@ -188,8 +188,8 @@ async function getLinkItems(categoryJson, count, category) {
     //var browser = await puppeteer.launch();
     var browser = await puppeteer.launch({
         //executablePath: '/usr/bin/chromium-browser',
-        //args: ['--no-sandbox']
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
+        args: ['--no-sandbox']
+        //args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
 
     var pageURL = await browser.newPage();
