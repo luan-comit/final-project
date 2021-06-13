@@ -433,7 +433,10 @@ app.post('/updatePriceDate', function(req, res){
     }
 
     async function getpriceAwsLaptop(_url) {
-        var browser = await puppeteer.launch();
+        //var browser = await puppeteer.launch();
+        var browser = await puppeteer.launch({
+            args: ['--no-sandbox']
+        });
         var pageXpath = await browser.newPage();
 
         await pageXpath.goto(_url)
@@ -452,7 +455,10 @@ app.post('/updatePriceDate', function(req, res){
     }
 
     async function getpriceAwsGolf(_url) {
-        var browser = await puppeteer.launch();
+        //var browser = await puppeteer.launch();
+        var browser = await puppeteer.launch({
+            args: ['--no-sandbox']
+        });
         var pageXpath = await browser.newPage();
 
         await pageXpath.goto(_url)
@@ -471,7 +477,10 @@ app.post('/updatePriceDate', function(req, res){
     }
 
     async function getpriceBBLaptop(_url) {
-        var browser = await puppeteer.launch();
+        //var browser = await puppeteer.launch();
+        var browser = await puppeteer.launch({
+            args: ['--no-sandbox']
+        });
         var pageXpath = await browser.newPage();
 
         await pageXpath.goto(_url)
@@ -490,7 +499,10 @@ app.post('/updatePriceDate', function(req, res){
     }
     
     async function getpriceKJJLaptop(_url) {
-        var browser = await puppeteer.launch();
+        //var browser = await puppeteer.launch();
+        var browser = await puppeteer.launch({
+            args: ['--no-sandbox']
+        });
         var pageXpath = await browser.newPage();
 
         await pageXpath.goto(_url)
@@ -508,7 +520,10 @@ app.post('/updatePriceDate', function(req, res){
         browser.close();
     }
     async function getpriceKJJOldCar(_url) {
-        var browser = await puppeteer.launch();
+        //var browser = await puppeteer.launch();
+        var browser = await puppeteer.launch({
+            args: ['--no-sandbox']
+        });
         var pageXpath = await browser.newPage();
 
         await pageXpath.goto(_url)
@@ -863,7 +878,10 @@ app.post('/saveItem', isAuth, function (req, res) {
     }
     
     async function SaveAwsLaptop() {
-        var browser = await puppeteer.launch();
+        //var browser = await puppeteer.launch();
+        var browser = await puppeteer.launch({
+            args: ['--no-sandbox']
+        });
         var pageXpath = await browser.newPage();
         //itemToSave.email = email;
         //itemToSave.category = category;
@@ -949,7 +967,10 @@ app.post('/saveItem', isAuth, function (req, res) {
 
     // fetch info 1 item AWS Golf then insert to items_fetch collection
     async function SaveAwsGolf() {
-        var browser = await puppeteer.launch();
+        //var browser = await puppeteer.launch();
+        var browser = await puppeteer.launch({
+            args: ['--no-sandbox']
+        });
         var pageXpath = await browser.newPage();
 
         await pageXpath.goto(url)
@@ -987,7 +1008,10 @@ app.post('/saveItem', isAuth, function (req, res) {
     }
     // fetch info 1 item Bestbuy Laptop then insert to items_fetch collection
     async function SaveBBLaptop() {
-        var browser = await puppeteer.launch();
+        //var browser = await puppeteer.launch();
+        var browser = await puppeteer.launch({
+            args: ['--no-sandbox']
+        });
         var pageXpath = await browser.newPage();
 
         await pageXpath.goto(url)
@@ -1025,7 +1049,10 @@ app.post('/saveItem', isAuth, function (req, res) {
     }
     // fetch info 1 item Kijiji laptop then insert to items_fetch collection
     async function SaveKJJLaptop() {
-        var browser = await puppeteer.launch();
+        //var browser = await puppeteer.launch();
+        var browser = await puppeteer.launch({
+            args: ['--no-sandbox']
+        });
         var pageXpath = await browser.newPage();
 
         await pageXpath.goto(url)
@@ -1063,7 +1090,10 @@ app.post('/saveItem', isAuth, function (req, res) {
     }
     // fetch info 1 item Kijiji old car then insert to items_fetch collection
     async function SaveKJJOldCar() {
-        var browser = await puppeteer.launch();
+        //var browser = await puppeteer.launch();
+        var browser = await puppeteer.launch({
+            args: ['--no-sandbox']
+        });
         var pageXpath = await browser.newPage();
 
         await pageXpath.goto(url)
@@ -1101,7 +1131,10 @@ app.post('/saveItem', isAuth, function (req, res) {
     }
     // fetch info 1 item Kijiji House then insert to items_fetch collection
     async function SaveKJJHouse() {
-        var browser = await puppeteer.launch();
+        //var browser = await puppeteer.launch();
+        var browser = await puppeteer.launch({
+            args: ['--no-sandbox']
+        });
         var pageXpath = await browser.newPage();
 
         await pageXpath.goto(url)
