@@ -4,13 +4,13 @@ block contents
     // Jumbotron
     .container
         h3 Manage your shop     
-            a(href='./shop', target='blank')
-                span    Go to shop
+        hr
         //.jumbotron
         .table-responsive
             table.table.table-striped
                 thead
                     tr
+                        th No.
                         th.thumnail-tbl Image
                         th Click to edit
                         th Click to remove
@@ -21,6 +21,7 @@ block contents
                 tbody
                 each item in listItems
                     tr
+                        td= item.pos + 1
                         td.thumbnail-tbl
                                 img.shop-img-td-tbl(src= item.img_src) 
                         td

@@ -1493,7 +1493,7 @@ app.post('/paypal/execute-payment/:totalPayment', function (req, res) {
 
 
 /////////////////////////////////////END PAYPAL PAYMENT//////////////////////////////////
-const port = process.env.PORT;
+const port = process.env.PORT || 5000;
 
 app.listen(port,function(){
    console.log(`My project P0 running at port ${port}`);
