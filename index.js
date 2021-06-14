@@ -264,15 +264,7 @@ app.get('/monitor', function (req, res) {
                             record.price_list = '$' + (parseFloat(record.price.slice(1, lenp)) + parseFloat(record.saving.slice(6, lens))).toString();
                             console.log("Price listed after parsed saving + ", record.price_list);
                         }
-                        /*
-                        else { 
-                            if (record.price_list) {
-                            let len = record.price_list.length;
-                            record.price_list = '$' + parseFloat(record.price_list.slice(2,len)).toString();
-                            console.log("Price listed after parsed list ", record.price_list);
-                            }
-                        }
-                        */
+                        
                     })
                     console.log("values send to monitor.pug ::::::::", req.session.email);
                     res.render('monitor', { menu: 2, listItems: records, logged: req.session.isAuth, email: req.session.email });
@@ -329,56 +321,11 @@ app.post('/displaygraph', function (req, res) {
     })
 })
 
-/*
-app.post('/displaygraph', function(req,res){
-    //console.log(req.body);
-    //res.json(req.body);
-    mongoClient.connect(_mongoUrl, function(err, db){
-        if (err) throw err;
-        var dbo = db.db(_db);
-        dbo.collection(_itemsGraphCollection).findOne({url: req.body.url}, function(err, record){
-            if (err) throw err;
-            let arrayPrice = [];
-            let arrayDate = []
-            let graphLabel = record.title;
-            let graphUrl = record.url;
-
-            for (i = 0; i < record.price_date_Arr.length; i++){
-                let rawDate = new Date(record.price_date_Arr[i].date);
-                let displaydate = rawDate.getDate() + '/' + (rawDate.getMonth() + 1) + '/' + rawDate.getFullYear() + ' ' + rawDate.getHours() + ':' + rawDate.getMinutes();
-                //console.log(displaydate);
-                arrayDate[i] = displaydate;  
-                let len = record.price_date_Arr[i].price.length;
-                //console.log("price length::::", len);
-                let priceStr = record.price_date_Arr[i].price.slice(1, len).replace(/,/, '');
-                //console.log(priceStr);
-                arrayPrice[i] = parseFloat(priceStr);
-                
-                //arrayPrice[i] = record.price_date_Arr.price;
-            }
-            res.render('graph', { arrayPrice: arrayPrice, arrayDate: arrayDate, graphLabel: graphLabel, graphUrl: graphUrl });
-            //res.json(arrayPriceDate);
-            console.log("User::::::", req.session.email,'\n',arrayPrice, '\n', arrayDate);
-
-        })
-    })
-})
-*/
 app.post('/addShop', async function(req, res) {
     //var filter = { url: req.body.url };
-
     mongo_funcs.queryReturnItemMongoDB(_fetchItemsCollection, req.body.url);
     res.redirect('/manageshop'); 
-    //console.log("This is OBJ :::::", await _obj);
-/*
-    if (_obj != null) {
-        await mongo_funcs.insertMongoDB(_shopCollection, _obj);
-        res.json('item added to the shop');
-    }
-    else {
-       res.json('issue with adding item to shop');
-    }
-*/
+ 
 })
 
 app.post('/removeItem', async function(req, res){
@@ -400,12 +347,20 @@ app.post('/updatePriceDate', function(req, res){
             getpriceAwsLaptop(req.body.url);
             res.json("Updating price & date :::: " + Date(itemUpdate.date) + ". Go back and click display to see updated price");
             break;
+        case "Amazon Garmin":
+            getpriceAwsGarmin(req.body.url);
+            res.json("Updating price & date :::: " + Date(itemUpdate.date) + ". Go back and click display to see updated price");
+            break;
         case "Amazon Golf":
             getpriceAwsGolf(req.body.url);
             res.json("Updating price & date :::: " + Date(itemUpdate.date) + ". Go back and click display to see updated price");
             break;
         case "Bestbuy Laptop":
             getpriceBBLaptop(req.body.url);
+            res.json("Updating price & date :::: " + Date(itemUpdate.date) + ". Go back and click display to see updated price");
+            break;
+        case "Bestbuy Drone":
+            getpriceBBDrone(req.body.url);
             res.json("Updating price & date :::: " + Date(itemUpdate.date) + ". Go back and click display to see updated price");
             break;
         case "Kijiji Classic Car":
@@ -454,6 +409,28 @@ app.post('/updatePriceDate', function(req, res){
         browser.close();
     }
 
+    async function getpriceAwsGarmin(_url) {
+        //var browser = await puppeteer.launch();
+        var browser = await puppeteer.launch({
+            args: ['--no-sandbox']
+        });
+        var pageXpath = await browser.newPage();
+
+        await pageXpath.goto(_url)
+        try {
+            await pageXpath.waitForXPath(amazonGarmin.attr_xpath.price);
+            var [el4] = await pageXpath.$x(amazonGarmin.attr_xpath.price);
+            var price = await el4.getProperty('textContent');
+            itemUpdate.price = await price.jsonValue();
+            console.log("Price Date got:::::", itemUpdate);
+            updatePriceDateMongoDB();
+        }
+        catch (error) {
+            console.log('Error::::::::', error.message);
+        }
+        browser.close();
+    }
+
     async function getpriceAwsGolf(_url) {
         //var browser = await puppeteer.launch();
         var browser = await puppeteer.launch({
@@ -487,6 +464,28 @@ app.post('/updatePriceDate', function(req, res){
         try {
             await pageXpath.waitForXPath(bestbuyLaptop.attr_xpath.price);
             var [el4] = await pageXpath.$x(bestbuyLaptop.attr_xpath.price);
+            var price = await el4.getProperty('textContent');
+            itemUpdate.price = await price.jsonValue();
+            console.log("Price Date got:::::", itemUpdate);
+            updatePriceDateMongoDB();
+        }
+        catch (error) {
+            console.log('Error::::::::', error.message);
+        }
+        browser.close();
+    }
+
+    async function getpriceBBDrone(_url) {
+        //var browser = await puppeteer.launch();
+        var browser = await puppeteer.launch({
+            args: ['--no-sandbox']
+        });
+        var pageXpath = await browser.newPage();
+
+        await pageXpath.goto(_url)
+        try {
+            await pageXpath.waitForXPath(bestbuyDrone.attr_xpath.price);
+            var [el4] = await pageXpath.$x(bestbuyDrone.attr_xpath.price);
             var price = await el4.getProperty('textContent');
             itemUpdate.price = await price.jsonValue();
             console.log("Price Date got:::::", itemUpdate);
@@ -552,232 +551,25 @@ app.get('/fetch', function (req, res) {
 
 app.post('/fetch', async function (req, res) {
     let { category, count } = req.body;
-    //var linkItems = [];
     console.log(category);
 
-/*
-    //if (count > 20) count = 20 ;
-    
-    // get Golf Laptop
-    async function getAwsGolf() {
-        var browser = await puppeteer.launch();
-        var pageURL = await browser.newPage();
-
-        console.log("getAwsGolf: ", amazonGolf.Url);
-        await pageURL.goto(amazonGolf.Url);
-/*
-
-        for (let i = 0; i < count; i++) {
-            linkItems[i] = {}; 
-            try{
-                await pageURL.waitForXPath(amazonGolf.link_xpath[i], {visible: true, timeout: 5000})
-                var [el0] = await pageURL.$x(amazonGolf.link_xpath[i])
-                var link0 = await el0.getProperty('href')
-                linkItems[i].link = await link0.jsonValue();
-            }catch{
-                linkItems[i].link = '';
-            }
-
-            for (let i = 0; i < count; i++) {
-            linkItems[i] = {};
-            linkItems[i].link = await fetch_funcs.returnXPathValue(pageURL,amazonGolf.link_xpath[i],'href');
-            linkItems[i].pos = i + 1;
-            linkItems[i].cat = category;
-        }
-        // map item and send to fetch
-        if (!linkItems || linkItems.length === 0) {
-            res.render('fetch', { linkItems: false, logged: req.session.isAuth, email: req.session.email});
-        }
-        else {
-            linkItems.map(linkItem => {  // STILL GOT ISSUE with setting linkisNull value
-                if (linkItem.link === '' || linkItem.link === null || linkItem.link.length === 0) {
-                    linkItem.isNull = true;
-                }
-                else {
-                    linkItem.isNull = false;
-                }
-            })
-            res.render('fetch', { linkItems: linkItems, logged: req.session.isAuth, email: req.session.email});
-        }
-        browser.close();
-        console.log(linkItems);
-    }
-
-    // get Amazon Golf
-    async function getAwsLaptop() {
-        var browser = await puppeteer.launch();
-        var pageURL = await browser.newPage();
-
-        console.log("getAwsLaptop: ", amazonLaptop.Url);
-
-        await pageURL.goto(amazonLaptop.Url);
-        for (let i = 0; i < count; i++) {
-            linkItems[i] = {};
-            linkItems[i].link = await fetch_funcs.returnXPathValue(pageURL, amazonLaptop.link_xpath[i], 'href');
-            linkItems[i].pos = i + 1;
-            linkItems[i].cat = category;
-        }
-        // map item and send to fetch.ejs
-        if (!linkItems || linkItems.length === 0) {
-            res.render('fetch', { linkItems: false, logged: req.session.isAuth, email: req.session.email});
-        }
-        else {
-            linkItems.map(linkItem => {  // STILL GOT ISSUE with setting linkisNull value
-                if (linkItem.link === '' || linkItem.link === null || linkItem.link.length === 0) {
-                    linkItem.isNull = true;
-                }
-                else {
-                    linkItem.isNull = false;
-                }
-            })
-            res.render('fetch', { linkItems: linkItems, logged: req.session.isAuth, email: req.session.email});
-        }
-        browser.close();
-        console.log(linkItems);
-    }
-
-    // getBestBuyLaptop
-    async function getBBLaptop() {
-        var browser = await puppeteer.launch();
-        var pageURL = await browser.newPage();
-        console.log("getBestBuyLaptop: ", bestbuyLaptop.Url);
-        
-        //await pageURL.setDefaultNavigationTimeout(0);
-        await pageURL.goto(bestbuyLaptop.Url)
-            .then()
-            .catch(e => res.json(e))
-        
-        for (let i = 0; i < count; i++) {
-            linkItems[i] = {};
-            await pageURL.waitForXPath(bestbuyLaptop.link_xpath[i])
-                .then()
-                .catch(e => res.json(e))
-            var [el0] = await pageURL.$x(bestbuyLaptop.link_xpath[i])
-                .then()
-                .catch(e => res.json(e))
-            var link0 = await el0.getProperty('href')
-                            .then(console.log('OK next'))
-                            .catch(e => res.json(e))
-            console.log('Json value:::::::', await link0.jsonValue());
-            linkItems[i].link = await link0.jsonValue();
-            linkItems[i].pos = i + 1;
-            linkItems[i].cat = category;
-        }
-        // map item and send to fetch
-        if (!linkItems || linkItems.length === 0) {
-            res.render('fetch', { linkItems: false, logged: req.session.isAuth, email: req.session.email });
-        }
-        else {
-            linkItems.map(linkItem => {  // STILL GOT ISSUE with setting linkisNull value
-                if (linkItem.link === '' || linkItem.link === null || linkItem.link.length === 0) {
-                    linkItem.isNull = true;
-                }
-                else {
-                    linkItem.isNull = false;
-                }
-            })
-            res.render('fetch', { linkItems: linkItems, logged: req.session.isAuth, email: req.session.email });
-        }
-        await browser.close();
-        console.log(linkItems);
-    }
-    // get Kijiji laptop
-    /*
-    async function getKJJLaptop() {
-        let linkItems = []
-        var browser = await puppeteer.launch();
-        var pageURL = await browser.newPage();
-        console.log("get url ::: ", kijijiLaptop.Url);
-        await pageURL.goto(kijijiLaptop.Url);
-        for (let i = 0; i < count; i++) {
-            linkItems[i] = {};
-            linkItems[i].link = await fetch_funcs.returnXPathValue(pageURL, kijijiLaptop.link_xpath[i], 'href');
-            linkItems[i].pos = i + 1;
-            linkItems[i].cat = category;
-        }
-        await browser.close();
-        return linkItems;
-        //res.render('fetch', { linkItems: linkItems, logged: req.session.isAuth, email: req.session.email });
-        //console.log(linkItems);
-    }
-
-    // get Kijiji Old Car
-    async function getKJJOldCar() {
-        var browser = await puppeteer.launch();
-        var pageURL = await browser.newPage();
-        console.log("getKijijiOldCar: ", kijijiOldCar.Url);
-
-        //await pageURL.setDefaultNavigationTimeout(0);
-        await pageURL.goto(kijijiOldCar.Url);
-
-        for (let i = 0; i < count; i++) {
-            linkItems[i] = {};
-            linkItems[i].link = await fetch_funcs.returnXPathValue(pageURL, kijijiOldCar.link_xpath[i], 'href');
-            linkItems[i].pos = i + 1;
-            linkItems[i].cat = category;
-        }
-        // map item and send to fetch
-        if (!linkItems || linkItems.length === 0) {
-            res.render('fetch', { linkItems: false, logged: req.session.isAuth, email: req.session.email });
-        }
-        else {
-            linkItems.map(linkItem => {  // STILL GOT ISSUE with setting linkisNull value
-                if (linkItem.link === '' || linkItem.link === null || linkItem.link.length === 0) {
-                    linkItem.isNull = true;
-                }
-                else {
-                    linkItem.isNull = false;
-                }
-            })
-            res.render('fetch', { linkItems: linkItems, logged: req.session.isAuth, email: req.session.email });
-        }
-        await browser.close();
-        console.log(linkItems);
-    }
-    // get Kijiji House
-    async function getKJJHouse() {
-        var browser = await puppeteer.launch();
-        var pageURL = await browser.newPage();
-        console.log("getKijijiHouse: ", kijijiHouse.Url);
-
-        //await pageURL.setDefaultNavigationTimeout(0);
-        await pageURL.goto(kijijiHouse.Url);
-
-        for (let i = 0; i < count; i++) {
-            linkItems[i] = {};
-            linkItems[i].link = await fetch_funcs.returnXPathValue(pageURL, kijijiHouse.link_xpath[i], 'href');
-            linkItems[i].pos = i + 1;
-            linkItems[i].cat = category;
-        }
-        // map item and send to fetch
-        if (!linkItems || linkItems.length === 0) {
-            res.render('fetch', { linkItems: false, logged: req.session.isAuth, email: req.session.email });
-        }
-        else {
-            linkItems.map(linkItem => {  // STILL GOT ISSUE with setting linkisNull value
-                if (linkItem.link === '' || linkItem.link === null || linkItem.link.length === 0) {
-                    linkItem.isNull = true;
-                }
-                else {
-                    linkItem.isNull = false;
-                }
-            })
-            res.render('fetch', { linkItems: linkItems, logged: req.session.isAuth, email: req.session.email });
-        }
-        await browser.close();
-        console.log(linkItems);
-    }
 // Check category and insert database 
-*/
+
     switch (category){
         case "Amazon Laptop":
             res.render('fetch', { menu: 1, linkItems: await fetch_funcs.getLinkItems(amazonLaptop, count, category), logged: req.session.isAuth, email: req.session.email });
+            break;
+        case "Amazon Garmin":
+            res.render('fetch', { menu: 1, linkItems: await fetch_funcs.getLinkItems(amazonGarmin, count, category), logged: req.session.isAuth, email: req.session.email });
             break;
         case "Amazon Golf":
             res.render('fetch', { menu: 1, linkItems: await fetch_funcs.getLinkItems(amazonGolf, count, category), logged: req.session.isAuth, email: req.session.email });
             break;
         case "Bestbuy Laptop":
             res.render('fetch', { menu: 1, linkItems: await fetch_funcs.getLinkItems(bestbuyLaptop, count, category), logged: req.session.isAuth, email: req.session.email });
+            break;
+        case "Bestbuy Drone":
+            res.render('fetch', { menu: 1, linkItems: await fetch_funcs.getLinkItems(bestbuyDrone, count, category), logged: req.session.isAuth, email: req.session.email });
             break;
         case "Kijiji Classic Car":
             res.render('fetch', { menu: 1, linkItems: await fetch_funcs.getLinkItems(kijijiOldCar, count, category), logged: req.session.isAuth, email: req.session.email });
@@ -838,11 +630,17 @@ app.post('/saveItem', isAuth, function (req, res) {
                             case "Amazon Laptop":
                                 SaveAwsLaptop();
                                 break;
+                            case "Amazon Garmin":
+                                SaveAwsGarmin();
+                                break;
                             case "Amazon Golf":
                                 SaveAwsGolf();
                                 break;
                             case "Bestbuy Laptop":
                                 SaveBBLaptop();
+                                break;
+                            case "Bestbuy Drone":
+                                saveBBDrone();
                                 break;
                             case "Kijiji Classic Car":
                                 SaveKJJOldCar();
@@ -883,34 +681,13 @@ app.post('/saveItem', isAuth, function (req, res) {
             args: ['--no-sandbox']
         });
         var pageXpath = await browser.newPage();
-        //itemToSave.email = email;
-        //itemToSave.category = category;
-
+       
         await pageXpath.goto(url)
         try {
-            itemToSave.img_src = await fetch_funcs.returnXPathValue(pageXpath, amazonLaptop.attr_xpath.img_src,'src');
-            //await pageXpath.waitForXPath(amazonLaptop.attr_xpath.img_src);
-            //var [el1] = await pageXpath.$x(amazonLaptop.attr_xpath.img_src);
-            //var src = await el1.getProperty('src');
-            //itemToSave.img_src = await src.jsonValue();
-            
+            itemToSave.img_src = await fetch_funcs.returnXPathValue(pageXpath, amazonLaptop.attr_xpath.img_src,'src');    
             itemToSave.title = await fetch_funcs.returnXPathValue(pageXpath, amazonLaptop.attr_xpath.title, 'textContent');
-            //await pageXpath.waitForXPath(amazonLaptop.attr_xpath.title);
-            //var [el2] = await pageXpath.$x(amazonLaptop.attr_xpath.title);
-            //var title = await el2.getProperty('textContent');
-            //itemToSave.title = await title.jsonValue();
-
             itemToSave.price = await fetch_funcs.returnXPathValue(pageXpath, amazonLaptop.attr_xpath.price, 'textContent');
-            //await pageXpath.waitForXPath(amazonLaptop.attr_xpath.price);
-            //var [el4] = await pageXpath.$x(amazonLaptop.attr_xpath.price);
-            //var price = await el4.getProperty('textContent');
-            //itemToSave.price = await price.jsonValue();
-
             itemToSave.price_list = await fetch_funcs.returnXPathValue(pageXpath, amazonLaptop.attr_xpath.price_list, 'textContent');
-            //await pageXpath.waitForXPath(amazonLaptop.attr_xpath.price_list);
-            //var [el4] = await pageXpath.$x(amazonLaptop.attr_xpath.price_list);
-            //var price_list = await el4.getProperty('textContent');
-            //itemToSave.price_list = await price_list.jsonValue();
         }
         catch (error) {
             console.log('Error::::::::', error.message);
@@ -923,6 +700,30 @@ app.post('/saveItem', isAuth, function (req, res) {
         await mongo_funcs.insertMongoDB(_itemsGraphCollection, itemToSave);
     }
 
+    async function SaveAwsGarmin() {
+        //var browser = await puppeteer.launch();
+        var browser = await puppeteer.launch({
+            args: ['--no-sandbox']
+        });
+        var pageXpath = await browser.newPage();
+
+        await pageXpath.goto(url)
+        try {
+            itemToSave.img_src = await fetch_funcs.returnXPathValue(pageXpath, amazonGarmin.attr_xpath.img_src, 'src');
+            itemToSave.title = await fetch_funcs.returnXPathValue(pageXpath, amazonGarmin.attr_xpath.title, 'textContent');
+            itemToSave.price = await fetch_funcs.returnXPathValue(pageXpath, amazonGarmin.attr_xpath.price, 'textContent');
+            itemToSave.price_list = await fetch_funcs.returnXPathValue(pageXpath, amazonGarmin.attr_xpath.price_list, 'textContent');
+        }
+        catch (error) {
+            console.log('Error::::::::', error.message);
+        }
+        console.log('itemToSave to MongoDB: ', itemToSave);
+        browser.close();
+        await mongo_funcs.insertMongoDB(_fetchItemsCollection, itemToSave);
+        itemToSave.price_date_Arr = [];
+        itemToSave.price_date_Arr[0] = { price: itemToSave.price, date: itemToSave.date };
+        await mongo_funcs.insertMongoDB(_itemsGraphCollection, itemToSave);
+    }
     /*
     async function SaveAwsLaptop() {
         var browser = await puppeteer.launch();
@@ -1047,6 +848,32 @@ app.post('/saveItem', isAuth, function (req, res) {
         await mongo_funcs.insertMongoDB(_itemsGraphCollection, itemToSave);
 
     }
+
+    async function saveBBDrone() {
+        //var browser = await puppeteer.launch();
+        var browser = await puppeteer.launch({
+            args: ['--no-sandbox']
+        });
+        var pageXpath = await browser.newPage();
+
+        await pageXpath.goto(url)
+        try {
+            itemToSave.img_src = await fetch_funcs.returnXPathValue(pageXpath, bestbuyDrone.attr_xpath.img_src, 'src');
+            itemToSave.title = await fetch_funcs.returnXPathValue(pageXpath, bestbuyDrone.attr_xpath.title, 'textContent');
+            itemToSave.price = await fetch_funcs.returnXPathValue(pageXpath, bestbuyDrone.attr_xpath.price, 'textContent');
+            itemToSave.saving = await fetch_funcs.returnXPathValue(pageXpath, bestbuyDrone.attr_xpath.saving, 'textContent');
+        }
+        catch (error) {
+            console.log('Error::::::::', error.message);
+        }
+        console.log('itemToSave to MongoDB: ', itemToSave);
+        browser.close();
+        await mongo_funcs.insertMongoDB(_fetchItemsCollection, itemToSave);
+        itemToSave.price_date_Arr = [];
+        itemToSave.price_date_Arr[0] = { price: itemToSave.price, date: itemToSave.date };
+        await mongo_funcs.insertMongoDB(_itemsGraphCollection, itemToSave);
+    }
+
     // fetch info 1 item Kijiji laptop then insert to items_fetch collection
     async function SaveKJJLaptop() {
         //var browser = await puppeteer.launch();
