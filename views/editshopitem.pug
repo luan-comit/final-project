@@ -22,13 +22,12 @@ block contents
                 input#inputEmail.form-control(type='hidden', name='img_src', value= item.img_src)
                 input#inputEmail.form-control(type='hidden', name='category', value= item.category)
                 input#inputEmail.form-control(type='hidden', name='email', value= item.email)
-                input#inputEmail.form-control(type='hidden', name='img_src', value= item.img_src)
                 br
                 label(for='visible', style='margin-right: 10px') Is on Sale:    
                 if item.visible 
-                    input#inputCheckBox(type='checkbox', name='visible', checked, value= 'visible')
+                    input#inputCheckBox(type='checkbox', name='visible', checked, value= 1)
                 else
-                    input#inputCheckBox(type='checkbox', name='visible', value= 'visible')
+                    input#inputCheckBox(type='checkbox', name='visible', value= 0)
                 br
                 br
                 button.btn.btn-lg.btn-primary.btn-block(type='submit') Save

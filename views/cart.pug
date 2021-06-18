@@ -12,9 +12,9 @@ append styles
     // Jumbotron
     .container
         .jumbotron
-            h3 My Cart
+            h4 My Cart
                 a.mycart(href='./shop')
-                    span Shop
+                    span(style='font-size: small') Back to Shop
             .jumbotron
                 .table-responsive
                     table.table.table-striped
@@ -25,11 +25,12 @@ append styles
                                 th Quantity
                                 th Total 
                         tbody(id='tbl-body')
-            div.payment-btn(align='center')
+            div.payment-container(align='center')
+                button(id="paypal-button")
+                span(style='font-weight: bold') OR    
                 button(type="button" id="checkout-button") 
                     img(src='/img/stripe-checkout.jpg') 
-                button(id="paypal-button")
-
+                
         .container
             footer.footer
                 p © Price Monitor - ComIT NodeJS Project 2021

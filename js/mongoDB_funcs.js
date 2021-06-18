@@ -1,9 +1,7 @@
 
 const mongoClient = require('mongodb').MongoClient;
 const mongoose = require('mongoose');
-const _mongooseUrl = "mongodb://luan:12345abcdE@20.48.146.232:27017/myproject"
 
-//const _mongoUrl = "mongodb://luan:12345abcdE@20.48.146.232:27017";
 const _mongoUrl = "mongodb+srv://luan:12345abcdE@cluster0.jgfni.mongodb.net/myproject?retryWrites=true&w=majority";
 
 const _db = "myproject"; // database of the project
@@ -23,8 +21,6 @@ async function insertMongoDB(_collection, _object) {
             db.close();
         
         });
-
-
     });
 }
 

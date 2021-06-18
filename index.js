@@ -8,8 +8,12 @@ const ObjectId = require('mongodb').ObjectID;
 const mongo_funcs = require('./js/mongoDB_funcs');
 const fetch_funcs = require('./js/fetch_funcs');
 const mongoClient = require('mongodb');
+const dotenv = require('dotenv');
 //const _mongoUrl = "mongodb://luan:12345abcdE@20.48.146.232:27017";
-const _mongoUrl = "mongodb+srv://luan:12345abcdE@cluster0.jgfni.mongodb.net/myproject?retryWrites=true&w=majority";
+//const _mongoUrl = "mongodb+srv://luan:12345abcdE@cluster0.jgfni.mongodb.net/myproject?retryWrites=true&w=majority";
+dotenv.config();
+const _mongoUrl = process.env.mongoDB_URI;
+console.log(_mongoUrl);
 //const _appSessionsURI = "mongodb://comit:12345abcdE@20.48.146.232:27017/admin"
 //const _appSessionsURI = "mongodb://luan:12345abcdE@20.48.146.232:27017/myproject"
 const _appSessionsURI = "mongodb+srv://luan:12345abcdE@cluster0.jgfni.mongodb.net/myproject?retryWrites=true&w=majority";
@@ -110,9 +114,6 @@ getCategories();
 const session = require('express-session');
 const mongoDBSession = require('connect-mongodb-session')(session);
 const mongoose = require('mongoose');
-//const { raw } = require('body-parser');
-//const { render } = require('pug');
-//const { get } = require('./fetchItems');
 
 app.use(express.static(__dirname + '/public'));
 app.use(express.static(__dirname + '/'));
@@ -1055,11 +1056,15 @@ app.get('/editshopitem/:id', isAuth, async function (req, res) {
 
 app.post('/editshopitem', isAuth, function (req, res) {
     
-    var filter = { _id: ObjectId(req.params.id) };
+    var filter = { url: req.body.url };
+
+    console.log(req.body);
+
     var newItemValues = {
         title: req.body.title,
-        price: req.body.price,
-        price_list: req.body.price_list
+        price: parseInt(req.body.price),
+        price_list: parseInt(req.body.price_list),
+        visible: Boolean(req.body.visible)
     }
     updateItemShopMongoDB();
     // queryShopMongoDB query all the items in the shop collection to display to manageshop.pug 
@@ -1069,7 +1074,6 @@ app.post('/editshopitem', isAuth, function (req, res) {
             var dbo = db.db(_db);
             dbo.collection(_shopCollection).updateOne(filter, { $set: newItemValues }, (err, result) => {
                 if (err) throw err;
-                db.close();
                 //console.log(result);
                 console.log('item on shop was updated !');
                 res.redirect('/manageshop');
@@ -1092,7 +1096,7 @@ app.get('/deleteshopitem/:id', isAuth, function (req, res) {
 
 app.get('/shop', function (req, res) {
     queryShopMongoDB();
-    var cartCount = 1;
+    //var cartCount = 1;
     // queryShopMongoDB query all the items in the shop collection to display to shopping.pug 
     async function queryShopMongoDB() {
         await mongoClient.connect(_mongoUrl, function (err, db) {

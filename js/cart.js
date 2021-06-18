@@ -20,7 +20,7 @@ function showCart() {
             let img = document.createElement('img');
             //console.log(itemsCart[listItems[i].pos].img_src);
             img.setAttribute('src', itemsCart[listItems[i].pos].img_src);
-            img.setAttribute('class', 'thumbnail-img-td-tbl');
+            img.setAttribute('class', 'cart-img-td-tbl');
             td_img.appendChild(img);
             tr.appendChild(td_img);
 

@@ -3,7 +3,7 @@ include ./components/tables
 block contents  
     // Jumbotron
     .container
-        h3 Manage your shop (under development)    
+        h3 Manage your shop     
         hr
         //.jumbotron
         .table-responsive
@@ -18,8 +18,29 @@ block contents
                         th Selling Price 
                         th Original Price
                         th Is on Sale
-
-
+                tbody
+                each item in listItems
+                    tr
+                        td= item.pos + 1
+                        td.thumbnail-tbl
+                                img.shop-img-td-tbl(src= item.img_src) 
+                        td
+                            a(href="/editshopitem/" + item._id) Edit
+                        td
+                            a(href="/deleteshopitem/" + item._id) Remove
+                        td= item.title
+                        td $#{item.price}
+                        td $#{item.price_list}
+                        if item.visible 
+                            td YES 
+                        else 
+                            td NO
     .container
-            footer.footer
-                p © Price Monitor - ComIT NodeJS Project 2021
+        footer.footer
+            p © Price Monitor - ComIT NodeJS Project 2021
+    script.
+        const listItems = !{JSON.stringify(listItems)};
+        const clearcart =  !{JSON.stringify(clearcart)};
+        console.log(listItems);
+        console.log("Clear cart: ",clearcart);
+    script(src="../js/shop.js", defer)
