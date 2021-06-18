@@ -19,6 +19,7 @@ const mongoClient = require('mongodb');
 const dotenv = require('dotenv');
 
 dotenv.config();
+
 const _mongoUrl = process.env.mongoDB_URI;
 const _appSessionsURI = process.env.mongoDB_URI;
 
