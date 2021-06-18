@@ -8,15 +8,21 @@ const ObjectId = require('mongodb').ObjectID;
 const mongo_funcs = require('./js/mongoDB_funcs');
 const fetch_funcs = require('./js/fetch_funcs');
 const mongoClient = require('mongodb');
-const dotenv = require('dotenv');
-//const _mongoUrl = "mongodb://luan:12345abcdE@20.48.146.232:27017";
-//const _mongoUrl = "mongodb+srv://luan:12345abcdE@cluster0.jgfni.mongodb.net/myproject?retryWrites=true&w=majority";
-dotenv.config();
-const _mongoUrl = process.env.mongoDB_URI;
-console.log(_mongoUrl);
+
 //const _appSessionsURI = "mongodb://comit:12345abcdE@20.48.146.232:27017/admin"
 //const _appSessionsURI = "mongodb://luan:12345abcdE@20.48.146.232:27017/myproject"
-const _appSessionsURI = "mongodb+srv://luan:12345abcdE@cluster0.jgfni.mongodb.net/myproject?retryWrites=true&w=majority";
+//const _appSessionsURI = "mongodb+srv://luan:12345abcdE@cluster0.jgfni.mongodb.net/myproject?retryWrites=true&w=majority";
+
+//const _mongoUrl = "mongodb://luan:12345abcdE@20.48.146.232:27017";
+//const _mongoUrl = "mongodb+srv://luan:12345abcdE@cluster0.jgfni.mongodb.net/myproject?retryWrites=true&w=majority";
+
+const dotenv = require('dotenv');
+
+dotenv.config();
+const _mongoUrl = process.env.mongoDB_URI;
+const _appSessionsURI = process.env.mongoDB_URI;
+
+console.log(_mongoUrl);
 
 const _db = "myproject"; // database of the project
 const _usersCollection = "users"; // users collection

@@ -1,8 +1,13 @@
 
 const mongoClient = require('mongodb').MongoClient;
 const mongoose = require('mongoose');
+const dotenv = require('dotenv');
 
-const _mongoUrl = "mongodb+srv://luan:12345abcdE@cluster0.jgfni.mongodb.net/myproject?retryWrites=true&w=majority";
+dotenv.config();
+
+const _mongoUrl = process.env.mongoDB_URI;
+
+//const _mongoUrl = "mongodb+srv://luan:12345abcdE@cluster0.jgfni.mongodb.net/myproject?retryWrites=true&w=majority";
 
 const _db = "myproject"; // database of the project
 const _usersCollection = "users" // users collection
