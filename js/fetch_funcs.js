@@ -16,6 +16,7 @@ async function getLinkItems(categoryJson, count, category) {
     let linkItems = []
     //var browser = await puppeteer.launch();
     var browser = await puppeteer.launch({
+        executablePath: '/usr/bin/chromium-browser',
         args: ['--no-sandbox']
     });
     var pageURL = await browser.newPage();
