@@ -3,6 +3,7 @@ var addCart = document.querySelectorAll(".addCart");
 
 for (let i = 0; i < listItems.length; i++) {
 listItems[i].oncart = 0;
+//console.log('item', i , listItems[i]);
 }
 
 
@@ -12,8 +13,6 @@ for (let i = 0; i < listItems.length; i++) {
         //console.log(listItems[i]);
     })
 }
-
-
 
 function onloadItemNums(){
     let itemNums = localStorage.getItem('cartNums');
@@ -75,6 +74,7 @@ function addCost(item) {
         localStorage.setItem('totalBill', item.price);
     }
 }
+
 function clearCart(){
     if (clearcart) {
         localStorage.clear();

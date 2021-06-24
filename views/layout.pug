@@ -7,7 +7,11 @@ block body
 	.container
 		//  The justified navigation menu is meant for single line per list item.   Multiple lines will require custom code not provided by Bootstrap.
 		.masthead
-			h2.text-muted Price Monitor    
+			h2.text-muted Price Monitor  
+				if logged 
+					span.showuser= email
+				else
+					span.showguest guest 
 			nav
 				ul.nav.nav-justified
 					if menu == 0

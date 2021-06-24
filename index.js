@@ -126,7 +126,7 @@ app.use(express.static(__dirname + '/public'));
 app.use(express.static(__dirname + '/'));
 
 mongoose
-    .connect(_appSessionsURI, {
+    .connect(_mongoUrl, {
         useCreateIndex: true,
         useUnifiedTopology: true
     })
@@ -135,7 +135,7 @@ mongoose
     });
 
 const store = new mongoDBSession({
-    uri: _appSessionsURI,
+    uri: _mongoUrl,
     collection: 'appSessions',
 });
 
@@ -1182,7 +1182,7 @@ app.get('/shoptest', function (req, res) {
 /////////////////////////////////////END SHOP//////////////////////////////////
 
 /////////////////////////////////////STRIPE PAYMENT//////////////////////////////////
-const MYDOMAIN = 'https://luanle-test.herokuapp.com';
+const MYDOMAIN = 'http://localhost:5000';
 
 app.post('/stripe/:totalpayment', async (req, res) => {
     var totalpayment = parseInt(req.params.totalpayment);
@@ -1220,6 +1220,7 @@ app.get('/paymentcancel', (req, res) => {
 /////////////////////////////////////END STRIPE PAYMENT//////////////////////////////////
 
 ///////////////////////////////////// PAYPAL PAYMENT//////////////////////////////////
+
 app.get('/paypal', (req, res) => {
     res.render('paypal_client');
 })
@@ -1310,7 +1311,12 @@ app.post('/paypal/execute-payment/:totalPayment', function (req, res) {
                                 total: totalPayment,
                                 currency: 'CAD'
                             }
-                        }]
+                        }],
+                    redirect_urls:
+                    {
+                        return_url: 'localhost:5000/paymentsuccess',
+                        cancel_url: 'localhost:5000/paymentcancel'
+                    }
                 },
                 json: true
             },
@@ -1320,13 +1326,40 @@ app.post('/paypal/execute-payment/:totalPayment', function (req, res) {
                     return res.sendStatus(500);
                 }
                 // 4. Return a success response to the client
-                console.log("response after payment:::",response);
+                //console.log("response after payment:::",response);
                 res.json(
                     {
                         status: 'success'
                     });
             });
     });
+
+
+const paypal = require('paypal-rest-sdk');
+
+    app.get('/paypal/transactions', function(req, res) {
+        
+        paypal.configure({
+            'mode': 'sandbox',
+            'client_id': 'AZf8jBZYI-i70Xluv05zWV-janKczNr_RdM8oTyPLGYqeXkBuaM-SlDOIlRIL0JjMI8gW-ewawwGZNiz',
+            'client_secret': 'EK3Cv2lacph8J_uHEjM51b5J8lg7vPsfVwEWBzGDw0fFLc7kpf1L3dPfWmGI-8TKm9kAJ_l7evWr9SQH'
+        });
+
+        var listPayment = {
+            'count': '5',
+            'start_index': '10',
+            //'start_time':'2021-06-01T11:00:00Z',
+            //'end_time': '2021-06-23T20:00:00Z'
+        };
+
+        paypal.payment.list(listPayment, function (err, payment) {
+            if (err) {throw err; }
+            else {
+                res.json(payment);
+            }
+        });
+    })
+
 // Run `node ./server.js` in your terminal
 
 
