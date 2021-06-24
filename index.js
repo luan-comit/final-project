@@ -1177,8 +1177,8 @@ app.post('/paypal/create-payment/:totalPayment', function (req, res) {
                         }],
                     redirect_urls:
                     {
-                        return_url: `${MYDOMAIN}/paymentsuccess`,
-                        cancel_url: `${MYDOMAIN}/paymentcancel`
+                        return_url: 'http://localhost:5000/paymentsuccess',
+                        cancel_url: 'http://localhost:5000/paymentcancel'
                     }
                 },
                 json: true
@@ -1223,12 +1223,7 @@ app.post('/paypal/execute-payment/:totalPayment', function (req, res) {
                                 total: totalPayment,
                                 currency: 'CAD'
                             }
-                        }],
-                    redirect_urls:
-                    {
-                        return_url: 'localhost:5000/paymentsuccess',
-                        cancel_url: 'localhost:5000/paymentcancel'
-                    }
+                        }]
                 },
                 json: true
             },
@@ -1238,14 +1233,22 @@ app.post('/paypal/execute-payment/:totalPayment', function (req, res) {
                     return res.sendStatus(500);
                 }
                 // 4. Return a success response to the client
-                //console.log("response after payment:::",response);
-                res.json(
+                console.log("response after payment PaymentID:::", response.body.payer.payment_method, response.body.state, response.body.id, response.body.create_time);
+                console.log("response after payment payer:::", response.body.payer.payer_info);
+                //console.log("response after payment shipping:::", response.body.transactions[0].item_list.shipping_address);
+                console.log("response after payment transactions:::", response.body.transactions[0].amount.total, response.body.transactions[0].amount.currency);
+                
+                /*
+                res.json(response.body.payer.payment_method, response.body.id, response.body.create_time, 
+                    response.body.payer.payer_info, response.body.transactions[0].amount.total, 
+                    response.body.transactions[0].amount.currency,
                     {
-                        status: 'success'
+                        status: 'success',
                     });
+                */
+                res.redirect('paymentsuccess');
             });
     });
-
 
 const paypal = require('paypal-rest-sdk');
 
