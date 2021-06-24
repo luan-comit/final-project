@@ -19,6 +19,7 @@ async function getLinkItems(categoryJson, count, category) {
         //executablePath: '/usr/bin/chromium-browser',
     //    args: ['--no-sandbox']
     //});
+    
     const browser = await puppeteer.launch({
         args: [
             '--no-sandbox',
