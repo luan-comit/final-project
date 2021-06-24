@@ -15,17 +15,17 @@ async function returnXPathValue(_pageURL,_xPath,_property){
 async function getLinkItems(categoryJson, count, category) {
     let linkItems = []
     //var browser = await puppeteer.launch();
-    //var browser = await puppeteer.launch({
+    var browser = await puppeteer.launch({
         //executablePath: '/usr/bin/chromium-browser',
-    //    args: ['--no-sandbox']
-    //});
-    
-    const browser = await puppeteer.launch({
-        args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox'
-        ]
+        args: ['--no-sandbox']
     });
+
+    //const browser = await puppeteer.launch({
+    //    args: [
+    //        '--no-sandbox',
+    //        '--disable-setuid-sandbox'
+    //    ]
+    //});
 
     var pageURL = await browser.newPage();
     console.log("get url ::: ", categoryJson.Url);
