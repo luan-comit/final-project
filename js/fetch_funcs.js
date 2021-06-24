@@ -1,39 +1,5 @@
 const puppeteer = require('puppeteer');
 
-async function checkXPath(){
-const browser = await puppeteer.launch(/* { headless: false, defaultViewport: null } */);
-try {
-    const [page] = await browser.pages();
-
-    await page.goto('https://example.org/');
-
-    console.log(await isVisible1(page, '//p')); // true
-    console.log(await isVisible1(page, '//table')); // false
-
-    console.log(await isVisible2(page, '//p')); // true
-    console.log(await isVisible2(page, '//table')); // false
-} catch (err) { console.error(err); } finally { await browser.close(); }
-
-async function isVisible1(page, xPathSelector) {
-    try {
-        await page.waitForXPath(xPathSelector, { visible: true, timeout: 1000 });
-        return true;
-    } catch {
-        return false;
-    }
-}
-
-async function isVisible2(page, xPathSelector) {
-    const [element] = await page.$x(xPathSelector);
-    if (element === undefined) return false;
-
-    return await page.evaluate((e) => {
-        const style = window.getComputedStyle(e);
-        return style && style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
-    }, element);
-}
-}
-
 async function returnXPathValue(_pageURL,_xPath,_property){
 
     try {

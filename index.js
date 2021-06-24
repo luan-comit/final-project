@@ -1,29 +1,19 @@
 const bodyParser = require('body-parser');
 const express = require('express');
-//const fetch = require('node-fetch');
 const puppeteer = require('puppeteer');
-const stripe = require('stripe')('sk_test_51IwHwvFbB7dBcGLWHGmN5r4fvneIoHX4cLbl9zTqZcPganm2SMoD3XqUEShukLPNUmmLwacqZ6wLzfpReQutt22l009kJRWDuz');
 const ObjectId = require('mongodb').ObjectID;
 
 const mongo_funcs = require('./js/mongoDB_funcs');
 const fetch_funcs = require('./js/fetch_funcs');
 const mongoClient = require('mongodb');
-
-//const _appSessionsURI = "mongodb://comit:12345abcdE@20.48.146.232:27017/admin"
-//const _appSessionsURI = "mongodb://luan:12345abcdE@20.48.146.232:27017/myproject"
-//const _appSessionsURI = "mongodb+srv://luan:12345abcdE@cluster0.jgfni.mongodb.net/myproject?retryWrites=true&w=majority";
-
-//const _mongoUrl = "mongodb://luan:12345abcdE@20.48.146.232:27017";
-//const _mongoUrl = "mongodb+srv://luan:12345abcdE@cluster0.jgfni.mongodb.net/myproject?retryWrites=true&w=majority";
-
+const _mongoUrl = process.env.mongoDB_URI;
+const _stripeKey = process.env.stripeKey;
+const paypalClientID = process.env.paypalClientID;
+const paypalSecret = process.env.paypalSecret;
+const stripe = require('stripe')(_stripeKey);
 const dotenv = require('dotenv');
 
 dotenv.config();
-
-const _mongoUrl = process.env.mongoDB_URI;
-const _appSessionsURI = process.env.mongoDB_URI;
-
-console.log(_mongoUrl);
 
 const _db = "myproject"; // database of the project
 const _usersCollection = "users"; // users collection
@@ -31,17 +21,6 @@ const _fetchItemsCollection = "items_fetch";
 const _itemsGraphCollection = "items_graph";
 const _shopCollection = "shopping";
 const _linksCollection = "links_fetch";
-
-/*
-const amazonLaptop = require('./json/amazon_laptop.json');
-const amazonGolf = require('./json/amazon_golf.json');
-const bestbuyLaptop = require('./json/bestbuy_laptop.json');
-const kijijiHouse = require('./json/kijiji_house.json');
-const kijijiOldCar = require('./json/kijiji_oldcars.json');
-const kijijiLaptop = require('./json/kijiji_laptop.json');
-const bestbuyDrone = require('./json/bestbuy_drone.json');
-const amazonGarmin = require('./json/amazon_garmin.json');
-*/
 
 var amazonLaptop = {};
 var amazonGolf = {};
@@ -59,7 +38,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.urlencoded({extended: true}));
 app.set('view engine', 'pug');
 
-///////////////////////////////////// END GET CATEGORIES INFORMATION  //////////////////////////////////
+///////////////////////////////////// GET CATEGORIES INFORMATION  //////////////////////////////////
 
 async function getCategories() {
     await mongoClient.connect(_mongoUrl, function (err, db) {
@@ -95,15 +74,6 @@ async function getCategories() {
                             bestbuyDrone = records[i];
                         }
                     }
-                  /*
-                    console.log('AMZ Laptop :::', amazonLaptop);
-                    console.log('AMZ Golf :::', amazonGolf);
-                    console.log('AMZ Garmin :::', amazonGarmin);
-                    console.log('Bestbuy Laptop :::', bestbuyLaptop);
-                    console.log('Bestbuy Drone :::', bestbuyDrone);
-                    console.log('Kijiji Classic Car :::', kijijiOldCar);
-                    console.log('Kijiji Laptop :::', kijijiLaptop);
-                    */
                 }
             }
         })
@@ -117,6 +87,7 @@ getCategories();
 ///////////////////////////////////// END GET CATEGORIES INFORMATION  //////////////////////////////////
 
 ///////////////////////////////////// MANAGE LOGIN SESSION//////////////////////////////////
+
 
 const session = require('express-session');
 const mongoDBSession = require('connect-mongodb-session')(session);
@@ -147,6 +118,7 @@ app.use(session({
 }))
 
 /////////////////////////////////////END MANAGE LOGIN SESSION//////////////////////////////////
+// Check if user is logged in 
 
 const isAuth = function(req, res, next){
     if (req.session.isAuth){
@@ -157,19 +129,12 @@ const isAuth = function(req, res, next){
 }
 
 app.get('/', function (req, res) {
-    console.log(req.session);
     console.log(req.session.id);
     console.log(req.session.isAuth);    
     res.render('index', { menu: 0, logged: req.session.isAuth, email: req.session.email});
 })
-///////////////////////////////////// TEST LAYOUT and CSS STYLES //////////////////////////////////
-
-app.get('/layout', function (req, res) {
-    res.render('cover', { logged: req.session.isAuth, email: req.session.email });
-})
 
 ///////////////////////////////////// MANAGE USER REGISTRATION & LOGIN & LOGOUT //////////////////////////////////
-
 // registration for new user 
 // route = register , views = registration
 
@@ -177,10 +142,7 @@ app.get('/register', function (req, res) {
     res.render('register', { menu: 5, logged: req.session.isAuth, email: req.session.email});
 })
 app.post('/register', function(req, res) {
-    //const {} = req.body;
     console.log(req.body.email);
-    //console.log(req.body.username);
-    // check user if existed 
     mongoClient.connect(_mongoUrl, async function(err, db) {
         if (err) throw err;
         var dbo = db.db(_db);
@@ -732,47 +694,7 @@ app.post('/saveItem', isAuth, function (req, res) {
         itemToSave.price_date_Arr[0] = { price: itemToSave.price, date: itemToSave.date };
         await mongo_funcs.insertMongoDB(_itemsGraphCollection, itemToSave);
     }
-    /*
-    async function SaveAwsLaptop() {
-        var browser = await puppeteer.launch();
-        var pageXpath = await browser.newPage();
-        //itemToSave.email = email;
-        //itemToSave.category = category;
-
-        await pageXpath.goto(url)
-        try {
-            await pageXpath.waitForXPath(amazonLaptop.attr_xpath.img_src);
-            var [el1] = await pageXpath.$x(amazonLaptop.attr_xpath.img_src);
-            var src = await el1.getProperty('src');
-            itemToSave.img_src = await src.jsonValue();
-
-            await pageXpath.waitForXPath(amazonLaptop.attr_xpath.title);
-            var [el2] = await pageXpath.$x(amazonLaptop.attr_xpath.title);
-            var title = await el2.getProperty('textContent');
-            itemToSave.title = await title.jsonValue();
-
-            await pageXpath.waitForXPath(amazonLaptop.attr_xpath.price);
-            var [el4] = await pageXpath.$x(amazonLaptop.attr_xpath.price);
-            var price = await el4.getProperty('textContent');
-            itemToSave.price = await price.jsonValue();
-
-            await pageXpath.waitForXPath(amazonLaptop.attr_xpath.price_list);
-            var [el4] = await pageXpath.$x(amazonLaptop.attr_xpath.price_list);
-            var price_list = await el4.getProperty('textContent');
-            itemToSave.price_list = await price_list.jsonValue();
-        }
-        catch (error) {
-            console.log('Error::::::::', error.message);
-        }
-        console.log('itemToSave to MongoDB: ', itemToSave);
-        browser.close();
-        await mongo_funcs.insertMongoDB(_fetchItemsCollection, itemToSave);
-        itemToSave.price_date_Arr = [];
-        itemToSave.price_date_Arr[0] = { price: itemToSave.price , date: itemToSave.date };
-        await mongo_funcs.insertMongoDB(_itemsGraphCollection, itemToSave);
-
-    }
-   */
+   
 
     // fetch info 1 item AWS Golf then insert to items_fetch collection
     async function SaveAwsGolf() {
@@ -1034,11 +956,6 @@ app.get('/manageshop', isAuth, function (req, res) {
 
 app.get('/editshopitem/:id', isAuth, async function (req, res) {
 
-
-    //var url = { _id: ObjectId(req.params.url) };
-    
-    //await mongo_funcs.queryReturnItemMongoDB(_fetchItemsCollection, url);
-
     var filter = {_id: ObjectId(req.params.id)};
     queryItemShopMongoDB();
 
@@ -1103,7 +1020,6 @@ app.get('/deleteshopitem/:id', isAuth, function (req, res) {
 
 app.get('/shop', function (req, res) {
     queryShopMongoDB();
-    //var cartCount = 1;
     // queryShopMongoDB query all the items in the shop collection to display to shopping.pug 
     async function queryShopMongoDB() {
         await mongoClient.connect(_mongoUrl, function (err, db) {
@@ -1129,7 +1045,6 @@ app.get('/cart', function (req, res) {
 
     queryShopMongoDB();
 
-    var cartCount = 1;
     // queryShopMongoDB query all the items in the shop collection to display to shopping.pug 
     async function queryShopMongoDB() {
         await mongoClient.connect(_mongoUrl, function (err, db) {
@@ -1224,14 +1139,11 @@ app.get('/paymentcancel', (req, res) => {
 app.get('/paypal', (req, res) => {
     res.render('paypal_client');
 })
-
 var request = require('request');
 // Add your credentials:
 // Add your client ID and secret
-var CLIENT =
-    'AZf8jBZYI-i70Xluv05zWV-janKczNr_RdM8oTyPLGYqeXkBuaM-SlDOIlRIL0JjMI8gW-ewawwGZNiz';
-var SECRET =
-    'EK3Cv2lacph8J_uHEjM51b5J8lg7vPsfVwEWBzGDw0fFLc7kpf1L3dPfWmGI-8TKm9kAJ_l7evWr9SQH';
+var CLIENT = paypalClientID;
+var SECRET = paypalSecret;
 var PAYPAL_API = 'https://api-m.sandbox.paypal.com';
 //express()
     // Set up the payment:
@@ -1341,8 +1253,8 @@ const paypal = require('paypal-rest-sdk');
         
         paypal.configure({
             'mode': 'sandbox',
-            'client_id': 'AZf8jBZYI-i70Xluv05zWV-janKczNr_RdM8oTyPLGYqeXkBuaM-SlDOIlRIL0JjMI8gW-ewawwGZNiz',
-            'client_secret': 'EK3Cv2lacph8J_uHEjM51b5J8lg7vPsfVwEWBzGDw0fFLc7kpf1L3dPfWmGI-8TKm9kAJ_l7evWr9SQH'
+            'client_id': paypalClientID,
+            'client_secret': paypalSecret
         });
 
         var listPayment = {

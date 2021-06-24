@@ -1,18 +1,12 @@
 
 const mongoClient = require('mongodb').MongoClient;
-//const mongoose = require('mongoose');
+
 const dotenv = require('dotenv');
-
 dotenv.config();
-
 const _mongoUrl = process.env.mongoDB_URI;
 
-//const _mongoUrl = "mongodb+srv://luan:12345abcdE@cluster0.jgfni.mongodb.net/myproject?retryWrites=true&w=majority";
-
 const _db = "myproject"; // database of the project
-const _usersCollection = "users" // users collection
 const _itemFetchCollection = "items_fetch";
-const _itemGraphCollection = "items_graph";
 const _shoppingCollection = "shopping";
 
 async function insertMongoDB(_collection, _object) {
@@ -60,18 +54,6 @@ async function deleteGraphMongoDB(_url) {
         dbo.collection(_itemFetchCollection).deleteOne({ url: _url }, function (err, res) {
             if (err) throw err;
             console.log("1 document deleted ");
-            db.close();
-        });
-    });
-}
-
-async function updatePriceDateMongoDB(_collection, _url, _priceDate) {
-    await mongoClient.connect(_mongoUrl, function (err, db) {
-        if (err) throw err;
-        var dbo = db.db(_db);
-        dbo.collection(_collection).updateOne({url: _url} , { $push: {price_date_Arr: {_priceDate}}}, function (err, res) {
-            if (err) throw err;
-            console.log("price & date added ");
             db.close();
         });
     });
@@ -199,55 +181,8 @@ async function queryReturnItemMongoDB(_collection, _url) {
                 insertMongoDB("shopping", item);
              }
          });
-    })}
-
-/*
-async function queryReturnItemMongoDB(_collection, _filter) {
-    await mongoose.connect(_mongooseUrl, { useNewUrlParser: true, useUnifiedTopology: true });
-    var db = await mongoose.connection;
-    await db.on('error', console.error.bind('MongoDB connection error !'));
-    var Schema = mongoose.Schema;
-    var item = new Schema({
-        url: { Type: String },
-        email: { Type: String },
-        category: { Type: String },
-        img_src: { Type: String },
-        title: { Type: String },
-        price: { Type: Number },
-        date: { Type: Number },
-        price_list: { Type: Number },
-        visible: { Type: Boolean }
-    });
-
-    console.log(_collection);
-    console.log(_filter);
-
-    const itemModel =  mongoose.model(_collection, item);
-
-    var myData = new itemModel({
-        url: 'test',
-        email: 'test',
-        category: 'test',
-        img_src: 'test',
-        title: 'test',
-        price: 'test',
-        date: 111,
-        price_list: 122,
-        visible: true
-    });
-
-     myData.save( (err) => {
-        if (err) console.log(err);
-    });
-
-    await itemModel.find(_filter, 'url email category img_src title price date price_list visible' , (err, result) => {
-        if (err) throw err;
-        console.log(result);
-        return result;
-    });
+    })
 }
-*/
-
 
 module.exports =
 {
