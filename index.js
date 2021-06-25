@@ -10,6 +10,8 @@ const _mongoUrl = process.env.mongoDB_URI;
 const _stripeKey = process.env.stripeKey;
 const paypalClientID = process.env.paypalClientID;
 const paypalSecret = process.env.paypalSecret;
+const MYDOMAIN = process.env.appDomain;
+
 const stripe = require('stripe')(_stripeKey);
 const dotenv = require('dotenv');
 
@@ -1097,7 +1099,6 @@ app.get('/shoptest', function (req, res) {
 /////////////////////////////////////END SHOP//////////////////////////////////
 
 /////////////////////////////////////STRIPE PAYMENT//////////////////////////////////
-const MYDOMAIN = 'http://localhost:5000';
 
 app.post('/stripe/:totalpayment', async (req, res) => {
     var totalpayment = parseInt(req.params.totalpayment);
@@ -1107,7 +1108,7 @@ app.post('/stripe/:totalpayment', async (req, res) => {
         line_items: [
             {
                 price_data: {
-                    currency: 'cad',
+                    currency: 'CAD',
                     product_data: {
                         name: 'Price Monitor',
                         images: ['https://www.elearnexcel.com/wp-content/uploads/2013/08/Stripe-Logo.png'],
@@ -1121,6 +1122,21 @@ app.post('/stripe/:totalpayment', async (req, res) => {
         success_url: `${MYDOMAIN}/paymentsuccess`,
         cancel_url: `${MYDOMAIN}/paymentcancel`,
     });
+
+    //const session = await stripe.checkout.sessions.retrieve(stripeKey);
+    //console.log('Stripe session : ', session);
+    //console.log('Stripe payment intent : ', session.payment_intent);
+    //console.log('payment amount : $', session.amount_total/100);
+    let paymentIntent = await stripe.paymentIntents.retrieve(session.payment_intent);
+
+    //console.log('Stripe paymentIntent : ', paymentIntent);
+    console.log('Stripe API :::: ', paymentIntent.id);
+    console.log(paymentIntent.amount / 100,paymentIntent.currency);
+    //let rawDate = paymentIntent.created;
+    //let displayDate = rawDate.getDate() + '/' + (rawDate.getMonth() + 1) + '/' + rawDate.getFullYear() + '\n' + rawDate.getHours() + ':' + rawDate.getMinutes();
+    console.log(paymentIntent.created);
+    console.log(paymentIntent.payment_method_types[0]);
+
     res.json({ id: session.id });
 });
 
@@ -1177,8 +1193,8 @@ app.post('/paypal/create-payment/:totalPayment', function (req, res) {
                         }],
                     redirect_urls:
                     {
-                        return_url: 'http://localhost:5000/paymentsuccess',
-                        cancel_url: 'http://localhost:5000/paymentcancel'
+                        return_url: `${MYDOMAIN}/paymentsuccess`,
+                        cancel_url: `${MYDOMAIN}/paymentcancel`
                     }
                 },
                 json: true
@@ -1237,7 +1253,7 @@ app.post('/paypal/execute-payment/:totalPayment', function (req, res) {
                 console.log("response after payment payer:::", response.body.payer.payer_info);
                 //console.log("response after payment shipping:::", response.body.transactions[0].item_list.shipping_address);
                 console.log("response after payment transactions:::", response.body.transactions[0].amount.total, response.body.transactions[0].amount.currency);
-                
+
                 /*
                 res.json(response.body.payer.payment_method, response.body.id, response.body.create_time, 
                     response.body.payer.payer_info, response.body.transactions[0].amount.total, 
