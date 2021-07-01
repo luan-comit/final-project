@@ -1278,6 +1278,7 @@ app.post('/paypal/create-payment/:totalPayment', function (req, res) {
                         //return_url: 'http://localhost:5000/paymentsuccess',
                         return_url: `${MYDOMAIN}/paymentsuccess`,
                         //cancel_url: 'http://localhost:5000/paymentcancel'
+                        
                         cancel_url: `${MYDOMAIN}/paymentcancel`
                     }
                 },
