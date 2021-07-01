@@ -4,14 +4,13 @@ block contents
     // Jumbotron
     .container
         h3 Manage your shop     
-            a(href='./managebilling')
-                span    Billing
+        hr
         //.jumbotron
         .table-responsive
             table.table.table-striped
                 thead
                     tr
-                        th #
+                        th No.
                         th.thumnail-tbl Image
                         th Click to edit
                         th Click to remove
@@ -39,3 +38,9 @@ block contents
     .container
         footer.footer
             p © Price Monitor - ComIT NodeJS Project 2021
+    script.
+        const listItems = !{JSON.stringify(listItems)};
+        const clearcart =  !{JSON.stringify(clearcart)};
+        console.log(listItems);
+        console.log("Clear cart: ",clearcart);
+    script(src="../js/shop.js", defer)

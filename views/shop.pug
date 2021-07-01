@@ -19,6 +19,7 @@ append styles
                     table.table.table-striped
                         thead
                             tr
+                                th #
                                 th.thumnail-tbl Image
                                 th Click to add item to cart
                                 th Description
@@ -27,6 +28,7 @@ append styles
                         tbody
                         each item in listItems
                             tr
+                                td= item.pos + 1
                                 td.thumbnail-tbl
                                         img.shop-img-td-tbl(src= item.img_src) 
                                 td

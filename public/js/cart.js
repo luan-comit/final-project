@@ -214,13 +214,18 @@ function checkoutPayments() {
     var checkoutButton = document.getElementById("checkout-button");
     checkoutButton.addEventListener("click", function () {
         let totalPayment = localStorage.getItem('totalBill');
+        console.log("Before fetch stripe", totalPayment);
+
         fetch("/stripe/" + totalPayment, {
             method: "POST",
         })
             .then(function (response) {
+                console.log("TEST1");
                 return response.json();
             })
             .then(function (session) {
+                console.log("TEST2");
+
                 return stripe.redirectToCheckout({ sessionId: session.id });
             })
             .then(function (result) {
@@ -230,9 +235,11 @@ function checkoutPayments() {
                 if (result.error) {
                     alert(result.error.message);
                 }
+                console.log("TEST3");
+
             })
             .catch(function (error) {
-                console.error("Error:", error);
+                console.error("Error STRIPE POST:", error);
             });
     });
 

@@ -232,6 +232,77 @@ a:hover>div { display: block; }
  /* display:list-item; */
 }
 
+.contact-left{
+    float: left;
+    width: 25%;
+    border: 2px black solid;
+    margin: 80px 60px;
+    padding: 20px;
+}
+
+
+.contact-right{
+    float: right;
+    width: 50%;
+    margin: 80px 0px;
+    padding: 40px;
+}
+
+/* Style all font awesome icons */
+.fa {
+  padding: 20px;
+  font-size: 70px;
+  width: 100px;
+  text-align: center;
+  text-decoration: none;
+}
+
+.fa:hover {
+  opacity: 0.7;
+  background-color: cadetblue;
+}
+
+
+/* Facebook */
+.fa-facebook {
+  background: #3B5998;
+  color: white;
+  font-size: 150px;
+}
+
+/* Twitter */
+.fa-twitter {
+  background: #55ACEE;
+  color: white;
+
+  font-size: 150px;
+}
+
+.fa-linkedin{
+    background-color: #0A66C2;
+    color: white;
+}
+
+.fa-skype{
+    background-color: #2797E1;
+    color: white;
+}
+
+.email-btn{
+    size: auto;
+    background-color:cornflowerblue;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    font-size: 1.2rem;
+}
+.email-btn:hover{
+    color: rgb(236, 10, 29);
+}
+
+.txt-shadow{
+    text-shadow: 1px 2px rgb(23, 23, 139);
+}
 
 @media (min-width: 768px) {
   .nav-justified {

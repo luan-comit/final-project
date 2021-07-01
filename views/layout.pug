@@ -2,6 +2,7 @@ extends ./_bootstrap
 append styles
 	// Custom styles for this template
 	link(href='../css/justified-nav.css', rel='stylesheet')
+	link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css")
 
 block body
 	.container
@@ -38,8 +39,12 @@ block body
 					else
 						li
 							a(href='/manageshop') Manage Shop
-					li
-						a(href='#') Contact
+					if menu == 4
+						li.active 
+							a(href='/contact') Contact
+					else
+						li
+							a(href='/contact') Contact
 					if menu == 5
 						li.active
 							if logged 

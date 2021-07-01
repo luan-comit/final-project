@@ -23,6 +23,7 @@ const _fetchItemsCollection = "items_fetch";
 const _itemsGraphCollection = "items_graph";
 const _shopCollection = "shopping";
 const _linksCollection = "links_fetch";
+const _paymentsCollection = "payments_stripe_paypal";
 
 var amazonLaptop = {};
 var amazonGolf = {};
@@ -96,7 +97,7 @@ const mongoDBSession = require('connect-mongodb-session')(session);
 const mongoose = require('mongoose');
 
 app.use(express.static(__dirname + '/public'));
-app.use(express.static(__dirname + '/'));
+//app.use(express.static(__dirname + '/'));
 
 mongoose
     .connect(_mongoUrl, {
@@ -158,11 +159,14 @@ app.post('/register', function(req, res) {
                         demo1.email = req.body.email;
                     let demo2 = require('./json/kijiji_demo.json');
                         demo2.email = req.body.email;
-                    mongo_funcs.insertMongoDB("items_fetch", demo1);
-                    mongo_funcs.insertMongoDB("items_fetch", demo2);
+                    mongo_funcs.insertMongoDB(_fetchItemsCollection, demo1);
+                    mongo_funcs.insertMongoDB(_fetchItemsCollection, demo2);
+                    //mongo_funcs.insertMongoDB(_itemsGraphCollection, demo1);
+                    //mongo_funcs.insertMongoDB(_itemsGraphCollection, demo2);
                 }
                 else {
-                    return res.json('email existed, chose another email');
+                    //return res.json('email existed, chose another email');
+                    res.render('message', { msgID: 52, message:'email existed, chose another email' , menu: 5, logged: req.session.isAuth, email: req.session.email } )
                 }
             }    
         })
@@ -183,7 +187,8 @@ app.post('/login', function(req, res){
             if (err) throw err;
             else {
                 if (!user || user.length === 0 || user == null) {
-                    return res.json('username or password not matched');
+                    //return res.json('username or password not matched');
+                    res.render('message', { msgID: 51, message: 'username or password not matched', menu: 5, logged: req.session.isAuth, email: req.session.email })
                 }
                 else {
                     req.session.isAuth = true;
@@ -260,34 +265,45 @@ app.post('/displaygraph', function (req, res) {
         if (err) throw err;
         var dbo = db.db(_db);
         dbo.collection(_itemsGraphCollection).findOne({ url: req.body.url }, function (err, record) {
-            if (err) throw err;
-            let arrayPrice = [];
-            let arrayDate = []
-            let graphLabel = record.title;
-            let graphUrl = record.url;
-            if (!record.price || record.price == null || record.price.length == 0) {
-                res.json('Graph invalid !');
-            } else {
+            if (err) {
+                throw err;
+            }
+            else {
+                if (!record || record == null) {
+                    //res.render('error', {message:"Graph is null"});
+                    res.render('message', { msgID: 2, message: 'Graph invalid!', menu: 2, logged: req.session.isAuth, email: req.session.email })
 
-                for (i = 0; i < record.price_date_Arr.length; i++) {
-                    let rawDate = new Date(record.price_date_Arr[i].date);
-                    let displaydate = rawDate.getDate() + '/' + (rawDate.getMonth() + 1) + '/' + rawDate.getFullYear() + ' ' + rawDate.getHours() + ':' + rawDate.getMinutes();
-                    //console.log(displaydate);
-                    arrayDate[i] = displaydate;
-                    if (!record.price_date_Arr[i].price || record.price_date_Arr[i].price == null || record.price_date_Arr[i].price.length == 0) {
-                        arrayPrice[i] = 0;
-                    } else {
-                        let len = record.price_date_Arr[i].price.length;
-                        //console.log("price length::::", len);
-                        let priceStr = record.price_date_Arr[i].price.slice(1, len).replace(/,/, '');
-                        //console.log(priceStr);
-                        arrayPrice[i] = parseFloat(priceStr);
-                    }
-                    //arrayPrice[i] = record.price_date_Arr.price;
+
                 }
-                res.render('graph', { menu: 2, arrayPrice: arrayPrice, arrayDate: arrayDate, graphLabel: graphLabel, graphUrl: graphUrl });
-                //res.json(arrayPriceDate);
-                console.log("User::::::", req.session.email, '\n', arrayPrice, '\n', arrayDate);
+                else {
+                    if (!record.price || record.price == null || record.price.length == 0) {
+                        res.render('message', { msgID: 2, message: 'Graph invalid!', menu: 2, logged: req.session.isAuth, email: req.session.email })
+                    } else {
+                        let arrayPrice = [];
+                        let arrayDate = []
+                        let graphLabel = record.title;
+                        let graphUrl = record.url;
+                        for (i = 0; i < record.price_date_Arr.length; i++) {
+                            let rawDate = new Date(record.price_date_Arr[i].date);
+                            let displaydate = rawDate.getDate() + '/' + (rawDate.getMonth() + 1) + '/' + rawDate.getFullYear() + ' ' + rawDate.getHours() + ':' + rawDate.getMinutes();
+                            //console.log(displaydate);
+                            arrayDate[i] = displaydate;
+                            if (!record.price_date_Arr[i].price || record.price_date_Arr[i].price == null || record.price_date_Arr[i].price.length == 0) {
+                                arrayPrice[i] = 0;
+                            } else {
+                                let len = record.price_date_Arr[i].price.length;
+                                //console.log("price length::::", len);
+                                let priceStr = record.price_date_Arr[i].price.slice(1, len).replace(/,/, '');
+                                //console.log(priceStr);
+                                arrayPrice[i] = parseFloat(priceStr);
+                            }
+                            //arrayPrice[i] = record.price_date_Arr.price;
+                        }
+                        res.render('graph', { menu: 2, arrayPrice: arrayPrice, arrayDate: arrayDate, graphLabel: graphLabel, graphUrl: graphUrl });
+                        //res.json(arrayPriceDate);
+                        console.log("User::::::", req.session.email, '\n', arrayPrice, '\n', arrayDate);
+                    }
+                }
             }
         })
     })
@@ -317,34 +333,42 @@ app.post('/updatePriceDate', function(req, res){
     switch (req.body.category) {
         case "Amazon Laptop":
             getpriceAwsLaptop(req.body.url);
-            res.json("Updating price & date :::: " + Date(itemUpdate.date) + ". Go back and click display to see updated price");
+            //res.json("Updating price & date :::: " + Date(itemUpdate.date) + ". Go back and click display to see updated price");
+            res.render('message', { msgID: 2, message: `Updating price & date ::: ${Date(itemUpdate.date)} ::: Go back and click display to see updated price!`, menu: 2, logged: req.session.isAuth, email: req.session.email });
             break;
         case "Amazon Garmin":
             getpriceAwsGarmin(req.body.url);
-            res.json("Updating price & date :::: " + Date(itemUpdate.date) + ". Go back and click display to see updated price");
+            //res.json("Updating price & date :::: " + Date(itemUpdate.date) + ". Go back and click display to see updated price");
+            res.render('message', { msgID: 2, message: `Updating price & date ::: ${Date(itemUpdate.date)} ::: Go back and click display to see updated price!`, menu: 2, logged: req.session.isAuth, email: req.session.email });
             break;
         case "Amazon Golf":
             getpriceAwsGolf(req.body.url);
-            res.json("Updating price & date :::: " + Date(itemUpdate.date) + ". Go back and click display to see updated price");
+            res.render('message', { msgID: 2, message: `Updating price & date ::: ${Date(itemUpdate.date)} ::: Go back and click display to see updated price!`, menu: 2, logged: req.session.isAuth, email: req.session.email });
+            //res.json("Updating price & date :::: " + Date(itemUpdate.date) + ". Go back and click display to see updated price");
             break;
         case "Bestbuy Laptop":
             getpriceBBLaptop(req.body.url);
-            res.json("Updating price & date :::: " + Date(itemUpdate.date) + ". Go back and click display to see updated price");
+            //res.json("Updating price & date :::: " + Date(itemUpdate.date) + ". Go back and click display to see updated price");
+            res.render('message', { msgID: 2, message: `Updating price & date ::: ${Date(itemUpdate.date)} ::: Go back and click display to see updated price!`, menu: 2, logged: req.session.isAuth, email: req.session.email });
             break;
         case "Bestbuy Drone":
             getpriceBBDrone(req.body.url);
-            res.json("Updating price & date :::: " + Date(itemUpdate.date) + ". Go back and click display to see updated price");
+            //res.json("Updating price & date :::: " + Date(itemUpdate.date) + ". Go back and click display to see updated price");
+            res.render('message', { msgID: 2, message: `Updating price & date ::: ${Date(itemUpdate.date)} ::: Go back and click display to see updated price!`, menu: 2, logged: req.session.isAuth, email: req.session.email });
             break;
         case "Kijiji Classic Car":
             getpriceKJJOldCar(req.body.url);
-            res.json("Updating price & date :::: " + Date(itemUpdate.date) + ". Go back and click display to see updated price");
+            //res.json("Updating price & date :::: " + Date(itemUpdate.date) + ". Go back and click display to see updated price");
+            res.render('message', { msgID: 2, message: `Updating price & date ::: ${Date(itemUpdate.date)} ::: Go back and click display to see updated price!`, menu: 2, logged: req.session.isAuth, email: req.session.email });
             break;
         case "Kijiji Laptop":
             getpriceKJJLaptop(req.body.url);
-            res.json("Updating price & date :::: " + Date(itemUpdate.date) + ". Go back and click display to see updated price");
+            //res.json("Updating price & date :::: " + Date(itemUpdate.date) + ". Go back and click display to see updated price");
+            res.render('message', { msgID: 2, message: `Updating price & date ::: ${Date(itemUpdate.date)} ::: Go back and click display to see updated price!`, menu: 2, logged: req.session.isAuth, email: req.session.email });
             break;
         default:
-            res.send('Category is not available yet. Go back and chose another category');
+            //res.send('Category is not available yet. Go back and chose another category');
+            res.render('message', { msgID: 2, message: 'Updating issue!', menu: 2, logged: req.session.isAuth, email: req.session.email });
     }
     
     async function updatePriceDateMongoDB() {
@@ -550,7 +574,9 @@ app.post('/fetch', async function (req, res) {
             res.render('fetch', { menu: 1, linkItems: await fetch_funcs.getLinkItems(kijijiLaptop, count, category), logged: req.session.isAuth, email: req.session.email });
             break;
         default:
-            res.send('Category is not available yet. Go back and chose another category');
+            //res.send('Category is not available yet. Go back and chose another category');
+            res.render('message', { msgID: 1, message: 'Category is not available yet. Go back and chose another category', menu: 1, logged: req.session.isAuth, email: req.session.email })
+
     }
 })
 /////////////////////////////////////FETCH LINKS END//////////////////////////////////
@@ -568,23 +594,24 @@ app.post('/saveItem', isAuth, function (req, res) {
         itemToSave.email = req.session.email;
         //console.log("Check with json category:", category === amazonLaptop.Category_Name)
         itemToSave.category = category;
-        saveItemToMongoDB();
+        saveItemToMongoDB(url);
     }
     else { 
         console.log('No url'); 
     }
 
-    async function saveItemToMongoDB() { //check if item (url) exist in items_graph collection and copy if exist
+    async function saveItemToMongoDB(url) { //check if item (url) exist in items_graph collection and copy if exist
         await mongoClient.connect(_mongoUrl, function (err, db) {
             if (err) throw err;
             var dbo = db.db(_db);
+            console.log("url to find::::::", url);
             dbo.collection(_itemsGraphCollection).findOne({ url: url }, function (err, record) {
                 if (err) { throw err; }
                 else {
-                    if (!record || record == null || record.length == 0) {
+                    if (record == null) {
                         console.log("Item not in Graph collection. Goto new item process ::::: ");
                         saveNewItemToBothMongoDB();
-                    } else {                 
+                    } else { 
                         console.log("Item already in Graph collection. Now check in item_fetch collection ::::: ");
                         itemToSave.title = record.title;
                         itemToSave.price_list = record.price_list;
@@ -621,9 +648,11 @@ app.post('/saveItem', isAuth, function (req, res) {
                                 SaveKJJLaptop();
                                 break;
                             default:
-                                res.send('Category is not available yet. Go back and chose another category');
+                                //res.send('Category is not available yet. Go back and chose another category');
+                                res.render('message', { msgID: 1, message: 'Category is not available yet. Go back and chose another category', menu: 1, logged: req.session.isAuth, email: req.session.email })
                         }
-                    res.json("Item being inserted to both collections")
+                    //res.json("Item being inserted to both collections")
+        res.render('message', { msgID: 1, message: 'Item being inserted to item & graph collections', menu: 1, logged: req.session.isAuth, email: req.session.email });
     }
 
     async function saveNewItemToFetchMongoDB(){
@@ -636,10 +665,12 @@ app.post('/saveItem', isAuth, function (req, res) {
                     if (!result || result.length == 0) {
                         console.log("Item not in items_fetch collection. Now insert item to items_fetch collections ::::: ");
                         mongo_funcs.insertMongoDB(_fetchItemsCollection, itemToSave);
-                        res.json("Item being inserted into items_fetch collection")
+                        //res.json("Item being inserted into items_fetch collection")
+                        res.render('message', { msgID: 1, message: 'Item being inserted to item collections', menu: 1, logged: req.session.isAuth, email: req.session.email });
                     }else {
                         console.log("Item already in items_fetch collection. No insert ");
-                        res.json("Item existed in both collections ")
+                        //res.json("Item existed in both collections ")
+                        res.render('message', { msgID: 1, message: 'Item already existed', menu: 1, logged: req.session.isAuth, email: req.session.email });
                     }
                 }
             });
@@ -970,7 +1001,9 @@ app.get('/editshopitem/:id', isAuth, async function (req, res) {
                 if (err) throw err;
                 db.close();
                 if (!item || item == null) {
-                    res.json('mongoDB lookup issue !')
+                    //res.json('mongoDB lookup issue !')
+                    res.render('message', { msgID: 3, message: 'item not found!', menu: 3, logged: req.session.isAuth, email: req.session.email });
+
                 } else {
                     console.log(item[0]);
                     res.render('editshopitem', { menu: 3, item: item[0], logged: req.session.isAuth, email: req.session.email});
@@ -1017,6 +1050,39 @@ app.get('/deleteshopitem/:id', isAuth, function (req, res) {
 })
 
 /////////////////////////////////////END MANAGE SHOP//////////////////////////////////
+
+app.get('/contact', function(req, res)  {
+
+    res.render('contact', { menu: 4, logged: req.session.isAuth, email: req.session.email });
+
+})
+
+/////////////////////////////////////MANAGE BILLING//////////////////////////////////
+
+app.get('/managebilling', isAuth, function (req, res) {
+    queryShopMongoDB();
+    // queryShopMongoDB query all the items in the shop collection to display to manageshop.pug 
+    async function queryShopMongoDB() {
+        await mongoClient.connect(_mongoUrl, function (err, db) {
+            if (err) throw err;
+            var dbo = db.db(_db);
+            dbo.collection(_paymentsCollection).find().toArray(function (err, records) {
+                if (err) throw err;
+                db.close();
+                if (!records || records == null || records.length === 0) {
+                    res.render('billing', { menu: 3, listItems: false, logged: req.session.isAuth, email: req.session.email })
+                } else {
+                    records.map(function (record, index) {
+                        record.pos = index;
+                    });
+                    res.render('billing', { menu: 3, listItems: records, logged: req.session.isAuth, email: req.session.email });
+                }
+            });
+        });
+    }
+})
+
+/////////////////////////////////////END MANAGE BILLING//////////////////////////////////
 
 /////////////////////////////////////SHOP //////////////////////////////////
 
@@ -1102,13 +1168,21 @@ app.get('/shoptest', function (req, res) {
 
 app.post('/stripe/:totalpayment', async (req, res) => {
     var totalpayment = parseInt(req.params.totalpayment);
+    let transaction = {};
+    transaction.totalpayment = totalpayment;
+    transaction.payment_method = "stripe";
+    let today = new Date();
+    let date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+    let time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    let dateTime = date + ' ' + time;
+    transaction.create_time = dateTime;
     console.log("stripe requests :::: ", totalpayment);
     const session = await stripe.checkout.sessions.create({
         payment_method_types: ['card'],
         line_items: [
             {
                 price_data: {
-                    currency: 'CAD',
+                    currency: 'usd',
                     product_data: {
                         name: 'Price Monitor',
                         images: ['https://www.elearnexcel.com/wp-content/uploads/2013/08/Stripe-Logo.png'],
@@ -1119,16 +1193,21 @@ app.post('/stripe/:totalpayment', async (req, res) => {
             },
         ],
         mode: 'payment',
+        //success_url: 'http://localhost:5000/paymentsuccess',
         success_url: `${MYDOMAIN}/paymentsuccess`,
+        //cancel_url: 'http://localhost:5000/paymentcancel',
         cancel_url: `${MYDOMAIN}/paymentcancel`,
     });
-
+    //console.log("TESTTTTTTTTTTT");
+    
     //const session = await stripe.checkout.sessions.retrieve(stripeKey);
     //console.log('Stripe session : ', session);
     //console.log('Stripe payment intent : ', session.payment_intent);
     //console.log('payment amount : $', session.amount_total/100);
     let paymentIntent = await stripe.paymentIntents.retrieve(session.payment_intent);
-
+    transaction.id = paymentIntent.id;
+    transaction.payment_intent = paymentIntent
+    transaction.payment_intent.amount = paymentIntent.amount / 100;
     //console.log('Stripe paymentIntent : ', paymentIntent);
     console.log('Stripe API :::: ', paymentIntent.id);
     console.log(paymentIntent.amount / 100,paymentIntent.currency);
@@ -1136,7 +1215,8 @@ app.post('/stripe/:totalpayment', async (req, res) => {
     //let displayDate = rawDate.getDate() + '/' + (rawDate.getMonth() + 1) + '/' + rawDate.getFullYear() + '\n' + rawDate.getHours() + ':' + rawDate.getMinutes();
     console.log(paymentIntent.created);
     console.log(paymentIntent.payment_method_types[0]);
-
+    
+    mongo_funcs.insertMongoDB(_paymentsCollection, transaction);
     res.json({ id: session.id });
 });
 
@@ -1155,20 +1235,22 @@ app.get('/paymentcancel', (req, res) => {
 app.get('/paypal', (req, res) => {
     res.render('paypal_client');
 })
-var request = require('request');
-// Add your credentials:
-// Add your client ID and secret
+
+const request = require('request');
 var CLIENT = paypalClientID;
 var SECRET = paypalSecret;
 var PAYPAL_API = 'https://api-m.sandbox.paypal.com';
+// Add your credentials:
+// Add your client ID and secret
 //express()
     // Set up the payment:
     // 1. Set up a URL to handle requests from the PayPal button
 app.post('/paypal/create-payment/:totalPayment', function (req, res) {
+        //console.log(".ENV VARS ", CLIENT, SECRET, MYDOMAIN);
         // 2. Call /v1/payments/payment to set up the payment
-        console.log(req.params);
+        //console.log(req.params);
         var totalPayment = req.params.totalPayment;
-        console.log(totalPayment);
+        //console.log(totalPayment);
         request.post(PAYPAL_API + '/v1/payments/payment',
             {
                 auth:
@@ -1193,7 +1275,9 @@ app.post('/paypal/create-payment/:totalPayment', function (req, res) {
                         }],
                     redirect_urls:
                     {
+                        //return_url: 'http://localhost:5000/paymentsuccess',
                         return_url: `${MYDOMAIN}/paymentsuccess`,
+                        //cancel_url: 'http://localhost:5000/paymentcancel'
                         cancel_url: `${MYDOMAIN}/paymentcancel`
                     }
                 },
@@ -1214,9 +1298,11 @@ app.post('/paypal/create-payment/:totalPayment', function (req, res) {
     // 1. Set up a URL to handle requests from the PayPal button.
 app.post('/paypal/execute-payment/:totalPayment', function (req, res) {
         // 2. Get the payment ID and the payer ID from the request body.
-        console.log(req.params);
-        var totalPayment = req.params.totalPayment;
-        console.log(totalPayment);
+        //console.log(req.params);
+        let transaction = {};
+        var totalPayment = parseInt(req.params.totalPayment);
+        transaction.totalpayment = totalPayment;
+        console.log("Paypal :::", totalPayment);
 
         var paymentID = req.body.paymentID;
         var payerID = req.body.payerID;
@@ -1245,24 +1331,35 @@ app.post('/paypal/execute-payment/:totalPayment', function (req, res) {
             },
             function (err, response) {
                 if (err) {
-                    console.error(err);
+                    console.error("Throw error :::", err);
                     return res.sendStatus(500);
                 }
-                // 4. Return a success response to the client
-                console.log("response after payment PaymentID:::", response.body.payer.payment_method, response.body.state, response.body.id, response.body.create_time);
-                console.log("response after payment payer:::", response.body.payer.payer_info);
-                //console.log("response after payment shipping:::", response.body.transactions[0].item_list.shipping_address);
-                console.log("response after payment transactions:::", response.body.transactions[0].amount.total, response.body.transactions[0].amount.currency);
 
-                /*
-                res.json(response.body.payer.payment_method, response.body.id, response.body.create_time, 
-                    response.body.payer.payer_info, response.body.transactions[0].amount.total, 
-                    response.body.transactions[0].amount.currency,
+                // 4. Return a success response to the client
+                //console.log("response after payment:::", response);
+
+                //console.log("response after payment PaymentID:::", response.body.payer.payment_method, response.body.state, response.body.id, response.body.create_time);
+                //console.log("response after payment payer:::", response.body.payer.payer_info);
+                //console.log("response after payment shipping:::", response.body.transactions[0].item_list.shipping_address);
+                //console.log("response after payment transactions:::", response.body.transactions[0].amount.total, response.body.transactions[0].amount.currency);
+                
+                transaction.payment_method = response.body.payer.payment_method;
+                transaction.id =  response.body.id;
+                transaction.create_time =  response.body.create_time;
+                transaction.payer_info = response.body.payer.payer_info;
+                transaction.currency = response.body.transactions[0].amount.currency;
+                mongo_funcs.insertMongoDB(_paymentsCollection, transaction);
+
+                console.log("Transaction information ::", response.body.payer.payment_method, response.body.id, response.body.create_time,
+                    response.body.payer.payer_info, response.body.transactions[0].amount.total,
+                    response.body.transactions[0].amount.currency);
+                
+                    res.json(
                     {
                         status: 'success',
                     });
-                */
-                res.redirect('paymentsuccess');
+                
+                //res.redirect('paymentsuccess');
             });
     });
 
@@ -1277,8 +1374,8 @@ const paypal = require('paypal-rest-sdk');
         });
 
         var listPayment = {
-            'count': '5',
-            'start_index': '10',
+            'count': '15',
+            'start_index': '20',
             //'start_time':'2021-06-01T11:00:00Z',
             //'end_time': '2021-06-23T20:00:00Z'
         };
@@ -1290,8 +1387,6 @@ const paypal = require('paypal-rest-sdk');
             }
         });
     })
-
-// Run `node ./server.js` in your terminal
 
 
 /////////////////////////////////////END PAYPAL PAYMENT//////////////////////////////////

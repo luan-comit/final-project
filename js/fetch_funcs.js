@@ -41,9 +41,47 @@ async function getLinkItems(categoryJson, count, category) {
     return linkItems;
     //console.log(linkItems);
 }
+//==================================save an item =======================
+
+
+async function saveAwsItem(url, category, email) {
+    var itemToSave = {};
+    itemToSave.url = url;
+    itemToSave.date = Date.now();
+    itemToSave.email = email;
+    //console.log("Check with json category:", category === amazonLaptop.Category_Name)
+    itemToSave.category = category;
+
+    //var browser = await puppeteer.launch();
+    var browser = await puppeteer.launch({
+        args: ['--no-sandbox']
+    });
+    var pageXpath = await browser.newPage();
+
+    await pageXpath.goto(url)
+    try {
+        itemToSave.img_src = await returnXPathValue(pageXpath, category.attr_xpath.img_src, 'src');
+        itemToSave.title = await returnXPathValue(pageXpath, category.attr_xpath.title, 'textContent');
+        itemToSave.price = await returnXPathValue(pageXpath, category.attr_xpath.price, 'textContent');
+        itemToSave.price_list = await returnXPathValue(pageXpath, category.attr_xpath.price_list, 'textContent');
+    }
+    catch (error) {
+        console.log('Error::::::::', error.message);
+    }
+    console.log('itemToSave to MongoDB: ', itemToSave);
+    browser.close();
+    //await mongo_funcs.insertMongoDB(_fetchItemsCollection, itemToSave);
+    itemToSave.price_date_Arr = [];
+    itemToSave.price_date_Arr[0] = { price: itemToSave.price, date: itemToSave.date };
+    //await mongo_funcs.insertMongoDB(_itemsGraphCollection, itemToSave);
+    return itemToSave;
+}
+
+//==============================================
 
 module.exports = {
     getLinkItems,
-    returnXPathValue
+    returnXPathValue,
+    saveAwsItem
 }
 
