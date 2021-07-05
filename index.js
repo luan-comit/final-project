@@ -155,7 +155,7 @@ app.post('/register', function(req, res) {
                 if(!user || user.length === 0 || user == null) {
                     mongo_funcs.insertMongoDB('users', req.body);
                     //res.render('login', { menu: 5,  logged: req.session.isAuth, email: req.session.email});
-                    res.render('message', { msgID: 52, message: `new email ${req.body.email} successfully added!`, menu: 5, logged: req.session.isAuth, email: req.session.email })
+                    res.render('message', { msgID: 51, message: `new email ${req.body.email} successfully added!`, menu: 5, logged: req.session.isAuth, email: req.session.email })
                     let demo1 = require('./json/amazon_demo.json');
                         demo1.email = req.body.email;
                     let demo2 = require('./json/kijiji_demo.json');

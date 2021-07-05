@@ -5,12 +5,36 @@
     "category": "Kijiji Classic Car",
     "img_src": "https://i.ebayimg.com/00/s/NjY5WDgwMA==/z/7ksAAOSwYc5ftchv/$_27.JPG",
     "title": "::: Demo record ::: 1966 Ford Mustang GT COUPE K-CODE HI-PO 289CI 4-SPEED FULLY RESTORED",
-    "price": "$69,900.00",
+    "price": "$89,900.00",
     "address": "5195 Portage Avenue, Headingley, MB, R4H 1E1",
     "price_date_Arr": [
         {
-            "price": "$69,900.00",
-            "date": 1621820474761.0
+            "price": "$89,900.00",
+            "date": 1621820474761
+        },
+        {
+            "price": "$79,900",
+            "date": 1625101141695
+        },
+        {
+            "price": "$79,900",
+            "date": 1625146573219
+        },
+        {
+            "price": "$79,900",
+            "date": 1625160896256
+        },
+        {
+            "price": "$69,900",
+            "date": 1625349557299
+        },
+        {
+            "price": "$69,900",
+            "date": 1625428662206
+        },
+        {
+            "price": "$69,900",
+            "date": 1625526258861
         }
     ]
 }
