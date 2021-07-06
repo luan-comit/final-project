@@ -35,5 +35,5 @@ App functions to date (online at http://luancomit.herokuapp.com)
   + Online shop http://luancomit.herokuapp.com/shop
   + Checkout cart, make order, pay with stripe or paypal (sandbox)
 
-7/ See captured images in demo pages folder for references: https://github.com/luan-comit/final-project/tree/main/demo%20pages
+7/ See captured images in demo pages folder for references: https://github.com/luan-comit/final-project/tree/master/demo%20pages
 
