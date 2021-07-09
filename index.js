@@ -781,10 +781,10 @@ app.post('/stripe/:totalpayment', async (req, res) => {
             },
         ],
         mode: 'payment',
-        success_url: 'http://localhost:5000/paymentsuccess',
-        //success_url: `${MYDOMAIN}/paymentsuccess`,
-        cancel_url: 'http://localhost:5000/paymentcancel',
-        //cancel_url: `${MYDOMAIN}/paymentcancel`,
+        //success_url: 'http://localhost:5000/paymentsuccess',
+        success_url: `${MYDOMAIN}/paymentsuccess`,
+        //cancel_url: 'http://localhost:5000/paymentcancel',
+        cancel_url: `${MYDOMAIN}/paymentcancel`,
     });
     //const session = await stripe.checkout.sessions.retrieve(stripeKey);
     let paymentIntent = await stripe.paymentIntents.retrieve(session.payment_intent);
@@ -853,10 +853,10 @@ app.post('/paypal/create-payment/:totalPayment', function (req, res) {
                         }],
                     redirect_urls:
                     {
-                        return_url: 'http://localhost:5000/paymentsuccess',
-                        //return_url: `${MYDOMAIN}/paymentsuccess`,
-                        cancel_url: 'http://localhost:5000/paymentcancel'
-                        //cancel_url: `${MYDOMAIN}/paymentcancel`
+                        //return_url: 'http://localhost:5000/paymentsuccess',
+                        return_url: `${MYDOMAIN}/paymentsuccess`,
+                        //cancel_url: 'http://localhost:5000/paymentcancel'
+                        cancel_url: `${MYDOMAIN}/paymentcancel`
                     }
                 },
                 json: true
