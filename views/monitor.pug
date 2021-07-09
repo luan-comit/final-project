@@ -17,12 +17,14 @@ block contents
                         th Original Price
                         th Initial Date
                         th Remove Item
-                        th Display Item
-                        th Update
+                        th Display Graph
+                        th Update Graph
+                        th Add to Shop
+
                 tbody
                  each item in listItems
                     tr
-                        td= item.pos
+                        td= item.pos + 1
                         td= item.category
                         td.thumnail-tbl
                             a(href= item.url, target='blank')
@@ -48,6 +50,11 @@ block contents
                                 input(type='text', value= item.category, name="category", hidden)
                                 input(type='text', value= item.url, name="url", hidden)
                                 button.btn-link(type="submit", name="update") Update
+                        td
+                            form(action="./addShop", method="POST") 
+                                input(type='text', value= item.category, name="category", hidden)
+                                input(type='text', value= item.url, name="url", hidden)
+                                button.btn-link(type="submit", name="update") Add_Shop
     .container
         footer.footer
-            p © Price Monitor Project 2021
+            p © Price Monitor - ComIT NodeJS Project 2021

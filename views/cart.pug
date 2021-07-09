@@ -1,0 +1,98 @@
+extends ./_bootstrap
+append styles
+    head 
+        link(rel="stylesheet", href="../css/style.css")
+        link(href='../css/justified-nav.css', rel='stylesheet')
+        script(src="https://polyfill.io/v3/polyfill.min.js?version=3.52.1&features=fetch")
+        script(src="https://js.stripe.com/v3/")
+        script(src="https://www.paypalobjects.com/api/checkout.js")
+
+    include ./components/tables
+    body
+    // Jumbotron
+    .container
+        .jumbotron
+            h4 My Cart
+                a.mycart(href='./shop')
+                    span(style='font-size: small') Back to Shop
+            .jumbotron
+                .table-responsive
+                    table.table.table-striped
+                        thead
+                            tr
+                                th.thumnail-tbl Product
+                                th Unit Price
+                                th 
+                                th Quantity
+                                th 
+                                th Total 
+                        tbody(id='tbl-body')
+            div.payment-container(align='center')
+                button(id="paypal-button")
+                span(style='font-weight: bold') OR    
+                button(type="button" id="checkout-button") 
+                    img(src='/img/stripe-checkout.jpg') 
+                
+        .container
+            footer.footer
+                p © Price Monitor - ComIT NodeJS Project 2021
+        script.
+            const listItems = !{JSON.stringify(listItems)};
+        // 
+            const totalPayment = localStorage.getItem('totalBill');
+            console.log(totalPayment);
+
+            // Create an instance of the Stripe object with your publishable API key
+            var stripe = Stripe("pk_test_51IwHwvFbB7dBcGLWIQQnLVcwZ1yvNDMU029ReetdkxackPrCxLhC3JC0vOTUI9lWYGkCT3fbvcKegvJuhcVNeXc100JvPxhkyT");
+            var checkoutButton = document.getElementById("checkout-button");
+            checkoutButton.addEventListener("click", function () {
+                fetch("/stripe/" + totalPayment, {
+                    method: "POST",
+                })
+                    .then(function (response) {
+                        return response.json();
+                    })
+                    .then(function (session) {
+                        return stripe.redirectToCheckout({ sessionId: session.id });
+                    })
+                    .then(function (result) {
+                        // If redirectToCheckout fails due to a browser or network
+                        // error, you should display the localized error message to your
+                        // customer using error.message.
+                        if (result.error) {
+                            alert(result.error.message);
+                        }
+                    })
+                    .catch(function (error) {
+                        console.error("Error:", error);
+                    });
+            });
+
+            // Paypal button process
+            paypal.Button.render({
+                env: 'sandbox', // Or 'production'
+                // Set up the payment:
+                // 1. Add a payment callback
+                payment: function (data, actions) {
+                    // 2. Make a request to your server
+                    return actions.request.post('/paypal/create-payment/' + totalPayment)
+                        .then(function (res) {
+                            // 3. Return res.id from the response
+                            return res.id;
+                        });
+                },
+                // Execute the payment:
+                // 1. Add an onAuthorize callback
+                onAuthorize: function (data, actions) {
+                    // 2. Make a request to your server
+                    return actions.request.post('/paypal/execute-payment/' + totalPayment, {
+                        paymentID: data.paymentID,
+                        payerID: data.payerID
+                    })
+                        .then(function (res) {
+                            // 3. Show the buyer a confirmation message.
+                        });
+                }
+            }, '#paypal-button');
+
+        script(src="../js/cart.js", defer)

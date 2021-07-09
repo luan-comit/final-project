@@ -126,7 +126,6 @@ body {
   color: red;
 }
 
-
 .align-center-td--tbl{
   align-items: center;
   align-content: center;
@@ -142,12 +141,68 @@ thumbnail-tbl{
   margin: none;
   padding: 0;
   align-items: center;
-  width: 20%;
+  width: 30%;
+}
+
+.thumbnail-img-div-cart {
+  display: block;
+  margin: none;
+  padding: 0;
+  align-items: center;
+  width: 30%;
 }
 
 /* hover link to show image */
 a>div { display: none; }
 a:hover>div { display: block; }
+
+/* table in shop.pug */
+
+.shop-img-td-tbl {
+  align-items: center;
+  margin: 10px;
+  padding: 0;
+  width: 50%;
+  display: block;
+}
+
+/* cart in shop.pug */
+
+.cart-img-td-tbl {
+  align-items: center;
+  margin: 10px;
+  padding: 0;
+  width: 7%;
+  display: block;
+}
+
+.mycart {
+  margin-left: 10px;
+  padding: 5px;
+  border-radius: 10px;
+  font-size: medium;
+  float:inherit;
+}
+.mycart:hover {
+  color: red;
+}
+
+.addCart {
+  background-color: blue;
+  color: #FFF;
+  padding: 3px;
+  border-radius: 5px;
+}
+.addCart:hover {
+  color:deeppink;
+}
+
+.td-sumbill {
+  font-size: larger ;
+  font-weight: bolder;
+  color: red
+}
+
 
 /* Form */
 .inputstl { 
@@ -160,6 +215,94 @@ a:hover>div { display: block; }
     -moz-box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px; 
     -webkit-box-shadow: rgba(0,0,0, 0.1) 0px 0px 8px; 
 } 
+
+.payment-container {
+  margin: none;
+  padding: auto;
+  display: inline-table;
+}
+.payment-container button {
+  border-radius: 35px;
+  background-color:white;
+  border: none;
+  height: 40px;
+  width: fit-content;
+  margin: 20px 100px;
+  align-content:initial;
+ /* display:list-item; */
+}
+
+.contact-left{
+    float: left;
+    width: 25%;
+    border: 2px black solid;
+    margin: 80px 60px;
+    padding: 20px;
+}
+
+
+.contact-right{
+    float: right;
+    width: 50%;
+    margin: 80px 0px;
+    padding: 40px;
+}
+
+/* Style all font awesome icons */
+.fa {
+  padding: 20px;
+  font-size: 70px;
+  width: 100px;
+  text-align: center;
+  text-decoration: none;
+}
+
+.fa:hover {
+  opacity: 0.7;
+  background-color: cadetblue;
+}
+
+
+/* Facebook */
+.fa-facebook {
+  background: #3B5998;
+  color: white;
+  font-size: 150px;
+}
+
+/* Twitter */
+.fa-twitter {
+  background: #55ACEE;
+  color: white;
+
+  font-size: 150px;
+}
+
+.fa-linkedin{
+    background-color: #0A66C2;
+    color: white;
+}
+
+.fa-skype{
+    background-color: #2797E1;
+    color: white;
+}
+
+.email-btn{
+    size: auto;
+    background-color:cornflowerblue;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    font-size: 1.2rem;
+}
+.email-btn:hover{
+    color: rgb(236, 10, 29);
+}
+
+.txt-shadow{
+    text-shadow: 1px 2px rgb(23, 23, 139);
+}
 
 @media (min-width: 768px) {
   .nav-justified {

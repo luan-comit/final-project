@@ -1,24 +1,25 @@
 
 const mongoClient = require('mongodb').MongoClient;
 
-const _mongoUrl = "mongodb://luan:12345abcdE@20.48.146.232:27017";
+const dotenv = require('dotenv');
+dotenv.config();
+const _mongoUrl = process.env.mongoDB_URI;
+
 const _db = "myproject"; // database of the project
-const _usersCollection = "users" // users collection
 const _itemFetchCollection = "items_fetch";
-const _itemGraphCollection = "items_graph";
+const _shoppingCollection = "shopping";
 
 async function insertMongoDB(_collection, _object) {
     await mongoClient.connect(_mongoUrl, function (err, db) {
         if (err) throw err;
         var dbo = db.db(_db);
-        dbo.collection(_collection).insertOne(_object, function (err, res) {
+        dbo.collection(_collection).insertOne(_object, function (err, res) 
+        {
             if (err) throw err;
             console.log("1 document inserted");
             db.close();
-
+        
         });
-
-
     });
 }
 
@@ -34,6 +35,17 @@ async function deleteFetchMongoDB(_email, _url) {
     });
 }
 
+async function deleteItemShopMongoDB(_filter) {
+    await mongoClient.connect(_mongoUrl, function (err, db) {
+        if (err) throw err;
+        var dbo = db.db(_db);
+        dbo.collection(_shoppingCollection).deleteOne(_filter, function (err, res) {
+            if (err) throw err;
+            console.log("1 item removed from shop ");
+            db.close();
+        });
+    });
+}
 
 async function deleteGraphMongoDB(_url) {
     await mongoClient.connect(_mongoUrl, function (err, db) {
@@ -42,18 +54,6 @@ async function deleteGraphMongoDB(_url) {
         dbo.collection(_itemFetchCollection).deleteOne({ url: _url }, function (err, res) {
             if (err) throw err;
             console.log("1 document deleted ");
-            db.close();
-        });
-    });
-}
-
-async function updatePriceDateMongoDB(_collection, _url, _priceDate) {
-    await mongoClient.connect(_mongoUrl, function (err, db) {
-        if (err) throw err;
-        var dbo = db.db(_db);
-        dbo.collection(_collection).updateOne({ url: _url }, { $push: { price_date_Arr: { _priceDate } } }, function (err, res) {
-            if (err) throw err;
-            console.log("price & date added ");
             db.close();
         });
     });
@@ -72,8 +72,8 @@ async function insertArrayMongoDB(_collection, _objectArray) {
 }
 
 
-async function checkUrlMongoDB(_collection, _url) {
-    return await mongoClient.connect(_mongoUrl, function (err, db) {
+async function checkUrlMongoDB(_collection, _url){
+     return await mongoClient.connect(_mongoUrl, function (err, db) {
         if (err) throw err;
         var dbo = db.db(_db);
         var result;
@@ -98,8 +98,8 @@ async function checkUrlMongoDB(_collection, _url) {
     })
 }
 
-async function insertFetchedItem(_collection, _item) {
-    if (checkUrlMongoDB(_collection, _item.url) == false) {
+async function insertFetchedItem(_collection, _item){
+    if (checkUrlMongoDB(_collection,_item.url) == false) {
         insertMongoDB(_collection, _item);
     }
     else {
@@ -113,7 +113,7 @@ async function querySavedItemsMongoDB(_collection, _email) { //check if item (ur
         var dbo = db.db(_db);
         dbo.collection(_collection).find({ email: _email }).toArray(function (err, records) {
             if (err) throw err;
-
+    
             if (!records || records == null || records.length === 0) {
                 console.log("values send to monitor.pug is NULLLLLLL ", _email);
                 db.close();
@@ -148,12 +148,40 @@ async function querySavedItemsMongoDB(_collection, _email) { //check if item (ur
 
                 })
                 db.close();
-                console.log("values send to monitor.pug :::::::: ", _email, '\n', records);
+                console.log("values send to monitor.pug :::::::: ", _email , '\n', records);
                 return records;
                 //res.render('monitor', { listItems: records, logged: _isAuth, email: _email });
             }
         });
     });
+}
+
+
+// queryShopMongoDB query all the items in the shop collection to display to manageshop.pug 
+
+async function queryReturnItemMongoDB(_collection, _url) {
+     await mongoClient.connect(_mongoUrl, async function (err, db) {
+        if (err)
+            throw err;
+        var dbo = await db.db(_db);
+        //console.log('url to check db', _url);
+        await dbo.collection(_collection).findOne({ url: _url }, function (err, item) {
+             if (err)
+                 throw err;
+             if (!item || item == null) {
+                 console.log("no item found");
+                 db.close();
+                 return ;
+             }
+             else {
+                console.log("1 item found, now insert to shop");
+                db.close();
+                item.visible = false;
+                console.log(item);
+                insertMongoDB("shopping", item);
+             }
+         });
+    })
 }
 
 module.exports =
@@ -164,5 +192,7 @@ module.exports =
     insertFetchedItem,
     deleteFetchMongoDB,
     deleteGraphMongoDB,
-    querySavedItemsMongoDB
+    querySavedItemsMongoDB,
+    queryReturnItemMongoDB,
+    deleteItemShopMongoDB
 };
