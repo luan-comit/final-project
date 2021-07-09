@@ -31,6 +31,7 @@ App functions to date (including fetch & manage & shop admin at http://luancomit
 5/ Payment gateways:
   + API with STRIPE and PAYPAL for online user payments
   + Gather payment transaction and update to mongoDB for billing
+  + Check billing update at https://luancomit.herokuapp.com/managebilling
 
 6/ eCommerce website:
   + Online shopping portal at http://luancomit.herokuapp.com/shop
