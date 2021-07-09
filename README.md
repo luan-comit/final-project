@@ -2,13 +2,14 @@
 
 This is Luan Le 's final project at ComIT NodeJS course, April 7 - July 7, 2021.
 
-App functions to date (online at http://luancomit.herokuapp.com)
+App functions to date (including fetch & manage & shop admin at http://luancomit.herokuapp.com ; and shopping portal at http://luancomit.herokuapp.com/shop)
 
 1/ Login/Register & Logout:
   + Click on Login/Register menu
   + Login or click Register new user
-  + Logged-in user-email will be shown on upper left corner of the page
-  + While logged-in, click logout menu to logout of the system
+  + Login to manage saved items & shop admin
+  + Logged-in session's user-email will be shown on upper left corner of the page
+  + Click logout menu to logout
 
 2/ Fetch items:
   + Choose one category and number of items you want to fetch (categories will be updated more when available)
@@ -32,8 +33,5 @@ App functions to date (online at http://luancomit.herokuapp.com)
   + Gather payment transaction and update to mongoDB for billing
 
 6/ eCommerce website:
-  + Online shop http://luancomit.herokuapp.com/shop
+  + Online shopping portal at http://luancomit.herokuapp.com/shop
   + Checkout cart, make order, pay with stripe or paypal (sandbox)
-
-7/ See captured images in demo pages folder for references: https://github.com/luan-comit/final-project/tree/master/demo%20pages
-
