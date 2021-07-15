@@ -2,6 +2,15 @@
 
 This is Luan Le 's final project at ComIT NodeJS course, April 7 - July 7, 2021.
 
+How was it built ?
+
++ Backend: NodeJS
++ Client: JavaScript
++ View engine: PUG, CSS, BootStrapCDN.com
++ Database: MongoDB (Atlast cloud)
++ API: stripe, paypal for payment and billing records
++ Platform: Heroku cloud
+
 App functions to date (including fetch & manage & shop admin at http://luancomit.herokuapp.com ; and shopping portal at http://luancomit.herokuapp.com/shop)
 
 1/ Login/Register & Logout:
