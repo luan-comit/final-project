@@ -7,7 +7,7 @@ How was it built ?
 + Backend: NodeJS
 + Client: JavaScript
 + View engine: PUG, CSS, BootStrapCDN.com
-+ Database: MongoDB (Atlast cloud)
++ Database: MongoDB (Atlas cloud)
 + API: stripe, paypal for payment and billing records
 + Platform: Heroku cloud
 
