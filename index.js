@@ -41,6 +41,7 @@ app.use(express.urlencoded({extended: true}));
 app.set('view engine', 'pug');
 
 ///////////////////////////////////// GET CATEGORIES INFORMATION  //////////////////////////////////
+
 async function getCategories() {
     await mongoClient.connect(_mongoUrl, function (err, db) {
         if (err) throw err;
